@@ -1,7 +1,7 @@
 <template>
   <div class ="aeris-day-image-host" >
     <div class="aeris-day-image-component-container">
-      <aeris-images-draw id="viewer"   service='https://sedoo.aeris-data.fr/actris-validation-rest/rest/validation/dailydetail?uuid=91440f71-9c3e-5d31-befc-2729873ce581&day='  ></aeris-images-draw>
+      <aeris-images-draw id="viewer"   service='https://sedoo.aeris-data.fr/actris-datacenter-rest/rest/validation/dailydetail?uuid=91440f71-9c3e-5d31-befc-2729873ce581&day='  ></aeris-images-draw>
       
   <!--  <aeris-images-draw id="viewer"   service='https://sedoo.aeris-data.fr/actris-validation-rest/rest/validation/daily?uuid=91440f71-9c3e-5d31-befc-2729873ce581&day='  ></aeris-images-draw>-->
       <div class="aeris-day-image-calendar-container">
@@ -34,10 +34,7 @@ const DATE_FORMAT = 'LL';
 export default {
 
   props: {
-    service: {
-      type: String,
-      default: ''
-    },
+    service:"",
 
     collection: {
       type: String,
@@ -156,7 +153,9 @@ export default {
       return this.hideTodayBtn;
 
     }),
-   
+    service : function () {
+      this.queryServiceDayComp();
+    }
   },
 
   methods: {

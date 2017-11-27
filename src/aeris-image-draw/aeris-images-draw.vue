@@ -2070,6 +2070,7 @@ input[type=number]::-webkit-outer-spin-button {
   background-color:#aaaaaa;
   color: #fff;
   border-radius: 50%;
+  padding: inherit;
 }
 
 .aeris-images-draw-zoom-panel button:hover {
@@ -2406,6 +2407,7 @@ input[type=number]::-webkit-outer-spin-button {
     font-size: 1.3rem;
     cursor: pointer;
     background-color: #4765a0;
+    border-radius: inherit;
 }
 .vue-tabs{
   font-size: 11px;
@@ -2415,13 +2417,14 @@ input[type=number]::-webkit-outer-spin-button {
   margin:5px;
   padding:5px;
   font-size: 15px;
+  max-width:200px;
 }
 
 .tab-container textarea{
   border: solid 1px #ddd;
   height: 100px;
   resize: none;
-  width: 70%;
+  width:100%;
 }
 
 
@@ -2431,7 +2434,7 @@ input[type=number]::-webkit-outer-spin-button {
   outline: none;
   border: 1px solid #ddd;
   cursor: pointer;
-  width: 80%;
+  width:100%;
   height: 30px;
 }
 
