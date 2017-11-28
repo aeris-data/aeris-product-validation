@@ -203,6 +203,10 @@ updated: function() {
 .page-template-template-fullwidth article .wrapper-content, .page-template-template-fullwidth [id="content-area"] {
     padding: 0;
 }
+
+[id="breadcrumbs"] > div::after{
+  display: none;
+}
 .serieActive{
   background-color: #555;
   color: #fff;
