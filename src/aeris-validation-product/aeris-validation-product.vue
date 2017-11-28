@@ -168,7 +168,7 @@ updated: function() {
 
 .aeris-validation-product-navbar {
   float: left;
-  max-width: 430px;
+  max-width: 410px;
   min-height: 500px;
   margin-right: 20px;
   background-color: #f5f5f5;
