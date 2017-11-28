@@ -207,6 +207,9 @@ updated: function() {
 [id="breadcrumbs"] > div::after{
   display: none;
 }
+[id="breadcrumbs"] > div::before {
+  display:none;
+}
 .serieActive{
   background-color: #555;
   color: #fff;
