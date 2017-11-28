@@ -200,13 +200,9 @@ updated: function() {
 
 }
 
-h1 {
-  height: 200px;
-  line-height: 200px;
-  text-align: center;
+.page-template-template-fullwidth article .wrapper-content, .page-template-template-fullwidth [id="content-area"] {
+    padding: 0;
 }
-
-
 .serieActive{
   background-color: #555;
   color: #fff;

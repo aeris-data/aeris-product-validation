@@ -2443,6 +2443,7 @@ input[type=number]::-webkit-outer-spin-button {
    outline: none;
    border: 1px solid #ddd;
    height: 30px;
+   padding: inherit;
 }
 
 </style>

@@ -390,7 +390,8 @@ aeris-images-draw {
   text-align: center;
   line-height: 30px;
   border: 1px solid;
-  cursor: pointer
+  cursor: pointer;
+  padding: inherit;
 }
 
 .aeris-day-image-today-button:hover {
