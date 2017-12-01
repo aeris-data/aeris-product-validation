@@ -54,8 +54,7 @@ export default {
       SerieTitle:"",
 
       serieListe :["Nephelometer time series for the Pic du Midi (65) station",
-                   "Radar VHF time series for the Centre de Recherche Atmospheriques de Lannemezan (65) station",       
-                   "Radar VHF"                   
+                   "Radar VHF time series for the Centre de Recherche Atmospheriques de Lannemezan (65) station",                        
                    ],
       
       orcid : {
@@ -65,23 +64,15 @@ export default {
       
     }
   },
- mounted: function() {
-    var event = new CustomEvent('aerisThemeRequest', {});
-    document.dispatchEvent(event);
-  },
+ 
 
- destroyed: function() {
-    document.removeEventListener('aerisTheme', this.aerisThemeListener);
-    this.aerisThemeListener = null;
-  },
+ 
 
   created : function () {
-
+  
   this.orcid="none"
   this.displayValidation=false
 
-  this.aerisThemeListener = this.handleTheme.bind(this);
-  document.addEventListener('aerisTheme', this.aerisThemeListener);
   
   document.addEventListener("aerisOrcidResponse", this.checkOrcidForvalidation.bind(this));
   var eventOrcid = new CustomEvent('aerisOrcidRequest');
@@ -89,9 +80,6 @@ export default {
 },
 
 
-updated: function() {
-    this.ensureTheme();
-  },
 
   
 
@@ -102,6 +90,7 @@ updated: function() {
       if (typeof(e.detail.user.orcid) != "undefined") {
         console.log("orcid : " + e.detail.user.orcid)
         this.orcid = e.detail.user.orcid
+ 
       } else {
         console.log("orcid is undefined")
       }
@@ -118,22 +107,38 @@ updated: function() {
       this.viewElement = document.querySelector('aeris-day-images');
       this.viewElement.setAttribute("service", this.serviceUrl);
       this.displayValidation=true
+      this.getLabelValue();
     },
     
-    handleTheme: function(event) {
-      console.log("handletheme ======= ")
-      console.log(event.detail)
-      this.theme = event.detail;
-      this.ensureTheme();
-    },
-
-    ensureTheme: function() {
-      
-        document.querySelector("header h3 i").style.color = this.theme.primary;
-      
+    
+    getLabelValue : function(uuid){
+     
+     var url_o = "https://sedoo.aeris-data.fr/actris-datacenter-rest/rest/quality/flags/"
+     
+     var service = url_o + "91440f71-9c3e-5d31-befc-2729873ce581"
+      $.when(
+            $.ajax({
+            url: service,
+            data: "",
+            contentType: "application/json; charset=utf-8", 
+            type: "GET",
+            success: function (data) {
+               console.log("ajax request for label quality ok ");     
+            },
+            error: function (x, y, z) {
+               alert(x.responseText +"  " +x.status);
+            }
+        })).then(function (resp){       
+            var event = new CustomEvent('getFlage', { 'detail': resp })
+            document.dispatchEvent(event);
+            });
+            
     }
-  }
+  
 
+  },
+
+  
 
 }
 </script>

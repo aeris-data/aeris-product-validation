@@ -18,7 +18,7 @@
           </div>
 
           <div class="aeris-images-draw-relative-container">
-            <div class="spinner" v-show="showSpinner"><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></div>
+            <div class="loader spinner" v-show="showSpinner"></div>
             <div class="aeris-images-draw-zoom-panel">
               
               <button v-on:click="buttonZoom" data-amount="1"style="border-raduis:50%">
@@ -372,9 +372,7 @@ export default {
 
       xmarks:[],
 
-      ymarks: {
-        type: Array
-      },
+      ymarks:[],
 
       mousePosition: {
         type: Object,
@@ -441,7 +439,7 @@ export default {
     this.isPanning = false
     this.panelOpen = false
     this.showSpinner= true
-  
+    document.addEventListener('getFlage', this.getQualityFlag.bind(this));
   },
 
   mounted: function () {
@@ -813,8 +811,7 @@ export default {
         realY: 0
       };
 
-      /*Get quality flag value*/
-      document.addEventListener('getFlage', this.getQualityFlag.bind(this));
+      
       /* KeyDown */
       document.addEventListener('keydown', this.handleKeyDown.bind(this));
 
@@ -1961,8 +1958,10 @@ export default {
 
  <style>
 .comment textarea {
-  border : 1px solid;
   resize: none;
+  border: 1px solid #ddd;
+  color:#555;
+  border-radius: 3px;
 
 }
 #input {
@@ -2115,7 +2114,8 @@ input[type=number]::-webkit-outer-spin-button {
   background: transparent;
   outline: none;
   border: 1px solid;
-  cursor: pointer
+  cursor: pointer;
+  
 }
 
 .aeris-images-draw-control-panel .coordinates {
@@ -2187,7 +2187,9 @@ input[type=number]::-webkit-outer-spin-button {
 
 .aeris-images-draw-sidepanel .informations textarea,
 .aeris-images-draw-sidepanel .informations select {
-  border: 1px solid
+  border: 1px solid #ddd;
+  color:#555;
+ 
 }
 
 .aeris-images-draw-sidepanel .informations select {
@@ -2197,7 +2199,8 @@ input[type=number]::-webkit-outer-spin-button {
 
 .aeris-images-draw-sidepanel .informations textarea {
   height: 100px;
-  resize: none
+  resize: none;
+ 
 }
 
 .aeris-images-draw-sidepanel .informations .button-group {
@@ -2351,7 +2354,10 @@ input[type=number]::-webkit-outer-spin-button {
   height: 30px;
   text-align: center;
   line-height: 30px;
-  font-size: 16px
+  font-size: 16px;
+  border-radius: 50%;
+  color :white;
+  background-color:  #4765a0;
 }
 
 .aeris-images-draw-control-input .input_coord{
@@ -2370,7 +2376,9 @@ input[type=number]::-webkit-outer-spin-button {
   color: inherit;
   background: transparent;
   outline: none;
-  border: 1px solid;
+  border: 1px solid #ddd;
+  color:#555;
+  border-radius: 3px;
   cursor: pointer
 }
 
@@ -2380,13 +2388,12 @@ input[type=number]::-webkit-outer-spin-button {
 
 .spinner{
     position: absolute;
-    height: 100px;
-    width: 100px;
+    height: 20px;
+    width: 20px;
     top: 50%;
     left: 50%;
     margin-left: -50px;
     margin-top: -50px;
-    background: url(/link/to/your/image);
     background-size: 100%;
 }
 
@@ -2425,6 +2432,8 @@ input[type=number]::-webkit-outer-spin-button {
   height: 100px;
   resize: none;
   width:100%;
+  color:#555;
+  border-radius: 3px;
 }
 
 
@@ -2436,14 +2445,40 @@ input[type=number]::-webkit-outer-spin-button {
   cursor: pointer;
   width:100%;
   height: 30px;
+  color:#555;
+  border-radius: 3px;
 }
 
 .tab-container input[type=button]{
   background: transparent;
    outline: none;
    border: 1px solid #ddd;
+   color:#555;
    height: 30px;
    padding: inherit;
 }
 
+
+
+.loader {
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #4765a0;
+  border-bottom: 16px solid #4765a0;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 </style>

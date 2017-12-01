@@ -2,8 +2,6 @@
   <div class ="aeris-day-image-host" >
     <div class="aeris-day-image-component-container">
       <aeris-images-draw id="viewer"   service='https://sedoo.aeris-data.fr/actris-datacenter-rest/rest/validation/dailydetail?uuid=91440f71-9c3e-5d31-befc-2729873ce581&day='  ></aeris-images-draw>
-      
-  <!--  <aeris-images-draw id="viewer"   service='https://sedoo.aeris-data.fr/actris-validation-rest/rest/validation/daily?uuid=91440f71-9c3e-5d31-befc-2729873ce581&day='  ></aeris-images-draw>-->
       <div class="aeris-day-image-calendar-container">
         <i class="fa fa-2x fa-angle-left" v-on:click="prevDay"></i>
         <input class="aeris-day-image-datepicker-input" id="datepicker"  v-model="selectedDay" @blur="getinputVal()" >
@@ -96,7 +94,6 @@ export default {
   created: function () {
 
     this.debugTrace(this.debug, "**created start")
-    //this.queryServiceDayComp();
     this.showql = false
     moment.locale(this.lang);
     this.selectedDay = moment(new Date());
@@ -193,7 +190,7 @@ export default {
       this.$.viewer.addEventListener('selectionModified', function (ev) {
         ev.detail.granule = this.selectedElem;
       }.bind(this));
-
+       
       this.$.viewer.addEventListener('selectionEnd', function (ev) {
         ev.detail.granule = this.selectedElem;
       }.bind(this))
@@ -208,7 +205,6 @@ export default {
       var _this = this; 
       var url_service = this.service+  _this.convert_Date_Format() 
       console.log("url_service " + url_service )
-
       $.ajax({
         url:url_service,
         data: _this.queryParams,
@@ -326,10 +322,8 @@ export default {
   padding: 0;
   color: #333;
   font-family: 'Open Sans', sans-serif;
-  /*border: 1px solid #ddd;*/
   overflow: auto;
   z-index:0;
-/*  box-shadow: 8px 8px 20px #aaa; */
 }
 
 .aeris-day-image-host * {
@@ -445,11 +439,13 @@ aeris-images-draw {
   display: none
 }
 
-.aeris-day-image-day-elements .input-radio:checked~.quicklook-label {
+.aeris-day-image-day-elements 
+.input-radio:checked~.quicklook-label {
   border-bottom: 3px solid rgba(255, 165, 0, 0.6)
 }
 
-.aeris-day-image-day-elements .input-radio:checked~.quicklook-label img {
+.aeris-day-image-day-elements
+.input-radio:checked~.quicklook-label img {
   opacity: 1
 }
 </style>
