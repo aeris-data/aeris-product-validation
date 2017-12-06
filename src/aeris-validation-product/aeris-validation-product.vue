@@ -8,8 +8,8 @@
           </h3>
         </header>
         <div class="aeris-validation-product-list">
-          <div class="aeris-validation-product-item" v-for="serieName in serieListe"   @click="activeSerie">
-            {{serieName}}
+          <div  class="aeris-validation-product-item" v-for="serie in serieListe"   @click="activeSerie " :data-uuid ="serie.uuid" :data-date-format="serie.date_format">
+            {{serie.name}} 
           </div>
         </div>
       </div>
@@ -40,6 +40,7 @@ export default {
   data() {
 
     return {
+      serieUuid:"",
       theme: null,
       aerisThemeListener: null,
       view: null,
@@ -53,9 +54,10 @@ export default {
 
       SerieTitle:"",
 
-      serieListe :["Nephelometer time series for the Pic du Midi (65) station",
-                   "Radar VHF time series for the Centre de Recherche Atmospheriques de Lannemezan (65) station",                        
-                   ],
+      serieListe :[
+                   { name: "Nephelometer time series for the Pic du Midi (65) station", uuid: "91440f71-9c3e-5d31-befc-2729873ce581", date_format:'LL' },
+                   { name: "Radar VHF time series for the Centre de Recherche Atmospheriques de Lannemezan (65) station", uuid :"4f92fdf2-d518-52a3-897e-2df1ed7af750",date_format:'MMMM YYYY'}                    
+      ],
       
       orcid : {
         type:String,
@@ -98,19 +100,29 @@ export default {
   
     activeSerie: function(e) {
       var clickedElement = e.target;
-      
       $(clickedElement).siblings().removeClass('serieActive');
       $(clickedElement).addClass('serieActive');
+
+
+     
+
       this.SerieTitle = $(clickedElement).text()
-  
-      this.serviceUrl="https://sedoo.aeris-data.fr/actris-datacenter-rest/rest/validation/daily?uuid=91440f71-9c3e-5d31-befc-2729873ce581&day="
+      var _this=this
+      this.serieUuid= clickedElement.getAttribute("data-uuid");
+      console.log(this.serieUuid)
+      var uuidPara =  "uuid="+this.serieUuid+"&day="
+      this.serviceUrl="https://sedoo.aeris-data.fr/actris-datacenter-rest/rest/validation/daily?"+uuidPara
       this.viewElement = document.querySelector('aeris-day-images');
       this.viewElement.setAttribute("service", this.serviceUrl);
+      this.viewElement.setAttribute("date_format", clickedElement.getAttribute("data-date-format"));
       this.displayValidation=true
       this.getLabelValue();
     },
     
-    
+     getUuid : function (uuid) {
+       return uuid
+     },
+
     getLabelValue : function(uuid){
      
      var url_o = "https://sedoo.aeris-data.fr/actris-datacenter-rest/rest/quality/flags/"

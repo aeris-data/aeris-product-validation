@@ -444,9 +444,10 @@ export default {
 
   mounted: function () {
     console.log("initialisation image draw...")
+     
     // valeur arbitaire peut etre changé
     // evite le redimensionnement au chargement du canvas 
-    $('.aeris-images-draw-relative-container').css('min-height', 340);
+  $('.aeris-images-draw-relative-container').css('min-height', 340);
     $('.aeris-images-draw-relative-container').css('min-width', 1000);
   },
  
@@ -474,7 +475,7 @@ export default {
     /*****************************************/
     queryService: function () {
       this.debugTrace(this.debug,"**queryService start")
-      if (!this.service || !this.uuid) return;
+     
       var _this = this;
       
       this.bounds = {};
@@ -488,7 +489,7 @@ export default {
         _this.jsonPara["canvas_"+_this.uuid]=data 
         _this.origBounds = data.bounds;
         _this.imgDate = moment.unix(data.timestamp).format('L - LT (Z)');
-       //_this.img = data.granules[0].media.content;
+        //_this.img = data.granules[0].media.content;
         _this.legend    = data.legend;
         _this.srcLegend = data.legend;
         _this.color = data.color
@@ -521,9 +522,13 @@ export default {
           }
           arrX.push(0 + ":00");
         } else {
-          for (var i = 1; i < 11; i++) {
-            arrX.push((((_this.bounds.xMax - _this.bounds.xMin) / 10) * i) + _this.bounds.xMin);
-            arrY.push((((_this.bounds.yMax - _this.bounds.yMin) / 10) * i) + _this.bounds.yMin);
+          for (var i = data.bounds.xMin; i <= data.bounds.xMax; i=i+1) {
+            arrX.push(i);
+          
+          }
+          for (var i = 4; i <= 16; i=i+2) {
+            arrY.push(i);
+           
           }
         }
         
@@ -570,6 +575,8 @@ export default {
           window.setTimeout(function () { 
             _this.resizeCanvas(_this.getCurrentCanvas());
             _this.uuidDisplay = _this.uuid
+            $(".aeris-images-draw-ymark").css("height" , '15%')
+            $(".aeris-images-draw-ymark").css("width", 'none')
           },5)
         } 
       }
@@ -632,7 +639,7 @@ export default {
 
       $(img).on('load', function() {
        // limite la taille du canvas 
-        if (img.width > 800) {
+       if (img.width > 800) {
           var ratio = img.height / img.width;
           img.width = 1000;
           img.height = img.width * ratio;
@@ -734,7 +741,7 @@ export default {
         canvas.add(el);
 
       }.bind(this));
-      canvas.renderAll();
+      canvas.renderAll();           
       this.debugTrace(this.debug, "**drawElements end")
     }, 150),
 
@@ -2328,7 +2335,6 @@ input[type=number]::-webkit-outer-spin-button {
   -ms-flex-flow: row wrap;
   flex-flow: row wrap;
   -ms-flex-pack: justify;
-  
   -ms-flex-align: center;
   align-items: center;
   margin: 10px 0 0 50px;

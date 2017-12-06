@@ -1,7 +1,8 @@
 <template>
   <div class ="aeris-day-image-host" >
     <div class="aeris-day-image-component-container">
-      <aeris-images-draw id="viewer"   service='https://sedoo.aeris-data.fr/actris-datacenter-rest/rest/validation/dailydetail?uuid=91440f71-9c3e-5d31-befc-2729873ce581&day='  ></aeris-images-draw>
+       <aeris-images-draw id="viewer"   service='https://sedoo.aeris-data.fr/actris-datacenter-rest/rest/validation/dailydetail?uuid=91440f71-9c3e-5d31-befc-2729873ce581&day='  ></aeris-images-draw>
+      <!--<aeris-images-draw id="viewer"   service=''  ></aeris-images-draw>-->
       <div class="aeris-day-image-calendar-container">
         <i class="fa fa-2x fa-angle-left" v-on:click="prevDay"></i>
         <input class="aeris-day-image-datepicker-input" id="datepicker"  v-model="selectedDay" @blur="getinputVal()" >
@@ -28,7 +29,8 @@
 
 <script>
  
-const DATE_FORMAT = 'LL';
+//const DATE_FORMAT = 'LL';
+/*const DATE_FORMAT = 'MMMM YYYY';*/
 export default {
 
   props: {
@@ -43,7 +45,7 @@ export default {
       type: String,
       default: 'fr',
     },
-   
+   date_format:""
   },
 
   data() {
@@ -88,17 +90,19 @@ export default {
       uuid_day : {
         type : String,
       }
+
+     
     }
   },
 
   created: function () {
-
+    this.date_format ="LL"
     this.debugTrace(this.debug, "**created start")
     this.showql = false
     moment.locale(this.lang);
     this.selectedDay = moment(new Date());
-    var selectedMoment = moment(this.selectedDay, DATE_FORMAT);
-    this.selectedDay = selectedMoment.format(DATE_FORMAT);
+    var selectedMoment = moment(this.selectedDay, this.date_format);
+    this.selectedDay = selectedMoment.format(this.date_format);
     this.debugTrace(this.debug, "**created end")
   },
 
@@ -122,7 +126,7 @@ export default {
 
     this.picker = new Pikaday({
       field: this.$el.querySelector("#datepicker"),
-      format: DATE_FORMAT,
+      format: this.date_format,
       maxDate: new Date(),
       firstDay: 1,
       defaultDate: new Date(),
@@ -145,14 +149,24 @@ export default {
       this.viewElement.setAttribute("date_file", this.convert_Date_Format());
       this.queryServiceDayComp();
       var today = moment(new Date());
-      var selected = moment(this.selectedDay, DATE_FORMAT);
+      var selected = moment(this.selectedDay, this.date_format);
       this.hideTodayBtn = selected.isSame(today, 'day') ? true : false;
       return this.hideTodayBtn;
 
     }),
+
     service : function () {
       this.queryServiceDayComp();
-    }
+    },
+
+    date_format : function() {
+       moment.locale("fr");
+    this.selectedDay = moment(new Date());
+    var selectedMoment = moment(this.selectedDay, this.date_format);
+     this.selectedDay = selectedMoment.format(this.date_format);
+   
+ 
+    } 
   },
 
   methods: {
@@ -166,7 +180,10 @@ export default {
         console.log(txt)
       }
     },
-
+    
+    getCurrentDateformat : function() {
+      return this.date_format
+    },
     /************************************************************/
     /* get current value from input text field of the datepicker*/
     /************************************************************/
@@ -179,7 +196,7 @@ export default {
     /********************************************************************/
     goToToday: function () {
       this.picker.setDate(new Date());
-      this.selectedDay = this.picker.getMoment().format(DATE_FORMAT);
+      this.selectedDay = this.picker.getMoment().format(this.date_format);
     },
 
     /*************************************************/
@@ -243,8 +260,9 @@ export default {
     /* Display the selected element in the view component */
     /******************************************************/
     showElement: function (selectedElem) {
-      this.debugTrace(this.debug, "**showElement start")
+      this.debugTrace(this.debug, "**showElement start" + this.selectedElem.uuid)
       this.viewElement.setAttribute("uuid", this.selectedElem.uuid);
+     
     },
 
     /* -------------------- */
@@ -288,8 +306,8 @@ export default {
     /******************************************/
     prevDay: function () {
       this.debugTrace(this.debug, "**prevDay start")
-      var selectedMoment = moment(this.selectedDay, DATE_FORMAT);
-      this.selectedDay = selectedMoment.subtract(1, 'days').format(DATE_FORMAT);
+      var selectedMoment = moment(this.selectedDay, this.date_format);
+      this.selectedDay = selectedMoment.subtract(1, 'days').format(this.date_format);
     },
 
     /*************************************/
@@ -297,9 +315,9 @@ export default {
     /*************************************/
     nextDay: function () {
       this.debugTrace(this.debug, "**nextDay start")
-      var selectedMoment = moment(this.selectedDay, DATE_FORMAT);
+      var selectedMoment = moment(this.selectedDay, this.date_format);
       if (selectedMoment.isBefore(moment(new Date()), 'day')) {
-        this.selectedDay = selectedMoment.add(1, 'days').format(DATE_FORMAT);
+        this.selectedDay = selectedMoment.add(1, 'days').format(this.date_format);
       }
     },
 
@@ -308,7 +326,7 @@ export default {
     /************************************/
     convert_Date_Format : function () {
       console.log("this.selectedDay : "+moment(this.selectedDay, 'DD MMMMMMM YYYY').format('YYYY-MM-DD'))
-      return moment(this.selectedDay, 'DD MMMMMMM YYYY').format('YYYY-MM-DD')//moment(this.selectedDay).format("YYYY-MM-DD")
+      return moment(this.selectedDay, 'DD MMMMMMM YYYY').format('YYYY-MM-DD')
     }
   }
 }
@@ -448,4 +466,6 @@ aeris-images-draw {
 .input-radio:checked~.quicklook-label img {
   opacity: 1
 }
+
+
 </style>
