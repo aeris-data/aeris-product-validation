@@ -27,7 +27,7 @@
 
      <div class="aeris-information-loggin" v-else>
        <h1>Authentification required</h1> 
-       <p>You must be logged in to access to this part of the data center.</p>
+       <p>You must be logged in to access to the data validation.</p>
     </div>
     </div>
   
