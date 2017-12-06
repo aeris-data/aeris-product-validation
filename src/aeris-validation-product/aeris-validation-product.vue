@@ -24,10 +24,13 @@
       </div>
     </div>
 
-    <div v-else>
-      <h1> Please login with your OrcID before start validation</h1>
+
+     <div class="aeris-information-loggin" v-else>
+       <h1>Authentification required</h1> 
+       <p>You must be logged in to access to this part of the data center.</p>
     </div>
-  </div>
+    </div>
+  
 </template>
 
 <script>
@@ -207,10 +210,26 @@ export default {
 
 }
 
-/*.aeris-validation-product-list .active {
-  background-color: orange;
-  color: #fff
-}*/
+.aeris-information-loggin {
+ display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 64px;
+    text-align: center;
+    background: #fafafa;
+}
+.aeris-information-loggin h1 {
+  border-bottom: 1px solid #f39c12;
+    font-size: 1.4rem;
+    font-weight: 300;
+    color: #555;
+}
+
+.aeris-information-loggin p {
+ font-size: 1.1rem;
+    margin: 15px;
+}
+
 
 .aeris-validation-product-validation-panel {
   float: right;
