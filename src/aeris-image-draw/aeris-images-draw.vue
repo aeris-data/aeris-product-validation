@@ -2364,6 +2364,7 @@ input[type=number]::-webkit-outer-spin-button {
   border-radius: 50%;
   color :white;
   background-color:  #4765a0;
+  padding: inherit
 }
 
 .aeris-images-draw-control-input .input_coord{
