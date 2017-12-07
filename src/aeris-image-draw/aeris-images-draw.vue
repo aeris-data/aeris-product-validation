@@ -130,7 +130,7 @@
                   <option value="zone">Zone</option>
                 </select>
 
-                <select class="selectQuality"name="quality" v-model="elt.quality" style="width:150px;">
+                <select class="selectQuality"name="quality" v-model="elt.quality" style="width:150px;" >
                   <option value="" selected disabled>&nbsp Quality</option>
                   <option :value="item.code" v-for="item in qualityList">{{item.label}}</option>
                 </select>
@@ -173,7 +173,10 @@
             <button  id="save" class="icon-button" type="button" v-on:click="saveCurrentCanvas()" title="Save" >
               <i class="fa fa-floppy-o" ></i>
             </button>
-         
+            <select style="font-weight: bold;background: #4765a0;border: none;width:3.3rem;height:2.9rem; font-size:11px;color:#fff"name="drawType" id="drawType">
+              <option value="range" selected>Range</option>
+              <option value="zone">Zone</option>
+            </select>
             <button id="drawMode" class="icon-button" type="button" v-on:click="drawMode" title="Draw Mode (d)" v-bind:class="{active : isDrawing}">
               <i class="fa fa-pencil-square-o"></i>
             </button>
@@ -198,10 +201,7 @@
               <i class="fa fa-trash"></i>
             </button>
   
-            <select style="font-weight: bold;background: #4765a0;border: none;width:3.3rem;height:2.9rem; font-size:11px;color:#fff"name="drawType" id="drawType">
-              <option value="range" selected>Range</option>
-              <option value="zone">Zone</option>
-            </select>
+            
              <button id="ManualyInput" class="icon-button" type="button" v-on:click="panelOpen=!panelOpen" title="Input manualy">
               <i class="fa fa-keyboard-o"></i>
             </button> 
@@ -218,29 +218,26 @@
         
         <!--<div class="informations">-->
          
-        <vue-tabs>
+        <vue-tabs v-model="tabName">
           <v-tab title="Legende">
            <div class="legend" >
           <img src="https://dummyimage.com/200x100/ddd/000.jpg&text=no+legende+available+">
         </div>
           </v-tab>
 
-          <v-tab title="Edit">
+          <v-tab title="Edit" :disabled="disableEdit">
           Edit element value 
-          <textarea rows="" cols="" placeholder="Comment" v-model="toolTipComment"></textarea>
+          <textarea rows="" cols="" placeholder="Comment" v-model="toolTipComment" ></textarea>
        
           
-            <select name="quality" v-model="toolTipQuality">
+            <select name="quality" v-model="toolTipQuality" >
               <option value="" selected disabled>Choose quality flag</option>
               <option :value="item.code" v-for="item in qualityList">{{item.label}}</option>
             </select>
              
           </v-tab>
          
-          <v-tab title="Miscellaneous">
-          <input  type="button" value="Documentation "/>
-           
-          </v-tab>
+          
         </vue-tabs>
 
           
@@ -289,6 +286,7 @@ export default {
   data() {
 
     return {
+      tabName:'',
       pickerSetting: {
       headerShow: false,
       },
@@ -400,7 +398,7 @@ export default {
       uuidDisplay: {
         type: String,
       },
-
+      disableEdit : true,
       manualElments: {},
 
       blankElment: {"comment": "",
@@ -504,7 +502,7 @@ export default {
         _this.origBounds= _this.bounds
 
        if (_this.uuid === 'no-graph'){        
-          _this.img ="https://dummyimage.com/1500x500/ddd/fff.jpg&text=no+graph+available+"
+          _this.img ="https://dummyimage.com/1500x500/ddd/fff.jpg&text=no+graph+available+for+the+current+date"
          // _this.resizeCanvas(_this.canvasTab[_this.getCurrentCanvasId()]);
 
        }else{
@@ -539,7 +537,7 @@ export default {
        // affichage spinner 
        _this.showSpinner = false
       }).fail(function (data) {
-        _this.img ="https://dummyimage.com/1500x500/babfc6/fff.jpg&text=no+graph+available+"
+        _this.img ="https://dummyimage.com/1500x500/babfc6/fff.jpg&text=no+graph+available+for+the+current+date"
         _this.resizeCanvas(_this.canvasTab[_this.getCurrentCanvasId()]);
         console.log('Error draw: ' + data.statusText);
       });
@@ -838,9 +836,10 @@ export default {
       canvas.wrapperEl.addEventListener("mousewheel", this.handleMouseWheel.bind(this));
       canvas.wrapperEl.addEventListener("DOMMouseScroll", this.handleMouseWheel.bind(this));
 
-      /* On element selection */
-      canvas.on('object:selected', this.handleObjectSelected.bind(this));
-
+      /* On element unselection */
+      canvas.on('before:selection:cleared', this.handleObjectUnselected.bind(this));
+       /* On element selection */
+      canvas.on('object:selected', this.handleObjectselected.bind(this));
       /* MouseOver */
       canvas.on('mouse:over', this.handleMouseOver.bind(this));
 
@@ -941,10 +940,10 @@ export default {
         };
 
         this.rect["aeris"] = {
-          comment: "XXXX",
-          quality: "XXXXX"
+          comment: "",
+          quality: ""
         }
-
+        this.toolTipComment =  this.rect["aeris"].comment
         var event = new CustomEvent('selectionEnd', { 'detail': obj })
         document.dispatchEvent(event);
 
@@ -1125,11 +1124,12 @@ export default {
       this.debugTrace(this.debug, "**handleMouseOut end")
     },
     /*************************************/
-    /*manage handle object selected event*/
+    /*manage handle object unselected event*/
     /*************************************/
-    handleObjectSelected: function(ev) {
-      this.debugTrace(this.debug, "**handleObjectSelected start")
-
+    handleObjectUnselected: function(ev) {
+      this.debugTrace(this.debug, "**handleObjectunSelected start")
+      this.disableEdit = true
+      this.tabName= "Legende"
       this.selectedElement = ev.target;
       this.elementInfos = this.selectedElement.aeris || {};
 
@@ -1149,7 +1149,22 @@ export default {
       /* Clear tooltip data */
       this.toolTipComment = '';
       this.toolTipQuality = '';
+      this.debugTrace(this.debug, "**handleObjectunSelected end")
+    },
+
+    /*************************************/
+    /*manage handle object selected event*/
+    /*************************************/
+    handleObjectselected: function(ev) {
+      this.disableEdit = false
+      this.debugTrace(this.debug, "**handleObjectSelected start")
+
+      this.selectedElement = ev.target;
+      this.toolTipQuality = this.selectedElement.aeris.quality;
+      this.toolTipComment = this.selectedElement.aeris.comment
+
       this.debugTrace(this.debug, "**handleObjectSelected end")
+      this.tabName = "Edit"
     },
 
     /*************************************/
