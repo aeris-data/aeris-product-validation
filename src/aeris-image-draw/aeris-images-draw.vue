@@ -7,7 +7,7 @@
         <div class="aeris-images-draw-y-axis-container">
           <!--type axe odronnées -->
           <div  v-if="scaleYType =='log'" class="aeris-images-draw-y-axis" style="position: relative;">
-             <span  class="aeris-image-draw-log-axis" v-for="log in logScale" 
+             <span  class="aeris-image-draw-log-axis" v-for="log in ymarks" 
                 :style="'z-index:'+log+';height:'+((Math.log10(log)*100)/Math.log10(500))+'%;'"> 
                 {{log}}
              </span>
@@ -424,7 +424,9 @@ export default {
 
       qualityList: [],
 
-      uuidArr: {}
+      uuidArr: {},
+      lastSelectedElementId:''
+
     }
 
   },
@@ -531,7 +533,7 @@ export default {
         }
         
         _this.xmarks = arrX;
-        _this.ymarks = arrY;
+        _this.ymarks = _this.logScale;
         //_this.logScale = [10,100,500],
         _this.canvasManager()
        // affichage spinner 
@@ -818,7 +820,7 @@ export default {
 
       
       /* KeyDown */
-      document.addEventListener('keydown', this.handleKeyDown.bind(this));
+     /* document.addEventListener('keydown', this.handleKeyDown.bind(this));*/
 
       /* Mousedown */
       canvas.on('mouse:down', this.handleMouseDown.bind(this));
@@ -838,8 +840,10 @@ export default {
 
       /* On element unselection */
       canvas.on('before:selection:cleared', this.handleObjectUnselected.bind(this));
+    
        /* On element selection */
       canvas.on('object:selected', this.handleObjectselected.bind(this));
+
       /* MouseOver */
       canvas.on('mouse:over', this.handleMouseOver.bind(this));
 
@@ -912,7 +916,7 @@ export default {
     /*manage handle Mouse Up event*/ 
     /*****************************/
     handleMouseUp: debounce(function(ev) {
-      this.debugTrace(this.debug, "**handleMouseUp start")
+      
       this.stop.x = parseInt(ev.e.clientX - this.canvasPosition.x);
       this.stop.y = parseInt(ev.e.clientY - this.canvasPosition.y);
       var _this = this;
@@ -949,14 +953,14 @@ export default {
 
       }
       canvas.renderAll();
-      this.debugTrace(this.debug, "**handleMouseUp end")
+      
     }, 100),
     /********************************/
     /*manage handle mouse down event*/
     /********************************/
     handleMouseDown: debounce(function(ev) {
-      this.debugTrace(this.debug, "**handleMouseDown start")
-
+      
+      this.disableEdit = false
       var _this = this;
       var canvas = this.getCurrentCanvas()
       this.start.x = parseInt(ev.e.clientX - this.canvasPosition.x);
@@ -988,15 +992,14 @@ export default {
         this.panning = true;
         canvas.selection = false;
       }
-      this.debugTrace(this.debug, "**handleMouseDown end")
+     
     }, 100),
 
     /********************************/
     /*manage handle mouse move event*/
     /********************************/
     handleMouseMove:  debounce (function (ev) {
-
-      this.debugTrace(this.debug, "**handleMouseMove start")
+      
       var canvas = this.getCurrentCanvas();
       var pointer = canvas.getPointer(ev.e);
 
@@ -1075,7 +1078,7 @@ export default {
     /*manage handle mouse wheel event*/
     /********************************/
     handleMouseWheel: function(ev) {
-      this.debugTrace(this.debug, "**handleMouseWheel start")
+      
 
       var ev = window.event || ev;
       var canvas = this.getCurrentCanvas()
@@ -1095,14 +1098,14 @@ export default {
         this.mousePosition.y = ev.offsetY;
         this.zoomTo(new fabric.Point(this.mousePosition.x, this.mousePosition.y), canvas);
       }
-      this.debugTrace(this.debug, "**handleMouseWheel end")
+      
     },
 
     /********************************/
     /*manage handle mouse over event*/
     /********************************/
     handleMouseOver: function(ev) {
-      this.debugTrace(this.debug, "**handleMouseOver start")
+    
       try {
         if (ev.target) {
           this.hovering = ev.target
@@ -1111,17 +1114,17 @@ export default {
       } catch (ex) {
         /* Do nothing */
       }
-      this.debugTrace(this.debug, "**handleMouseOver end")
+      
     },
 
     handleMouseOut: function(ev) {
-      this.debugTrace(this.debug, "**handleMouseOut start")
+      
       try {
         this.hovering = false;
       } catch (ex) {
         /* Do nothing */
       }
-      this.debugTrace(this.debug, "**handleMouseOut end")
+    
     },
     /*************************************/
     /*manage handle object unselected event*/
@@ -1144,27 +1147,43 @@ export default {
       if (this.comment) infos.comment = this.toolTipComment;
       if (this.quality) infos.quality = this.toolTipQuality;
 
-      this.saveInformations(infos);
+      //this.saveInformations(infos);
 
       /* Clear tooltip data */
       this.toolTipComment = '';
       this.toolTipQuality = '';
       this.debugTrace(this.debug, "**handleObjectunSelected end")
     },
-
     /*************************************/
     /*manage handle object selected event*/
     /*************************************/
     handleObjectselected: function(ev) {
+
       this.disableEdit = false
       this.debugTrace(this.debug, "**handleObjectSelected start")
-
       this.selectedElement = ev.target;
-      this.toolTipQuality = this.selectedElement.aeris.quality;
-      this.toolTipComment = this.selectedElement.aeris.comment
-
+      console.log("Current : "+ this.selectedElement.id)
+      console.log("Last : " +this.lastSelectedElementId)
+   
+     
+      if ( (this.selectedElement.id != this.lastSelectedElementId) && (this.lastSelectedElementId !='')){ 
+        console.log("current tool tip : " + this.toolTipComment)
+        console.log("getDrawElementById Last : " +this.lastSelectedElementId)
+        
+        this.getDrawElementById(this.lastSelectedElementId).aeris.comment= this.toolTipComment
+        this.getDrawElementById(this.lastSelectedElementId).aeris.quality= this.toolTipQuality
+        this.toolTipComment = '';
+        this.toolTipQuality = '';
+      }
+ 
+      this.lastSelectedElementId= this.selectedElement.id
       this.debugTrace(this.debug, "**handleObjectSelected end")
       this.tabName = "Edit"
+      if ( this.selectedElement.aeris.comment != ''){
+      this.toolTipQuality =this.selectedElement.aeris.quality;
+      this.toolTipComment = this.selectedElement.aeris.comment
+     }
+     
     },
 
     /*************************************/
@@ -1196,7 +1215,28 @@ export default {
       canvas.renderAll();
       this.debugTrace(this.debug, "**handleObjectModified end")
     }, 100),
+     /*******************/
+    /*Get element by id */
+    /********************/
 
+    getDrawElementById : function(id){
+       
+      if ( id ===""){console.log("****** no last id")}
+      else{ 
+      this.debugTrace(this.debug, "**deleteEntry start")
+      var canvas = this.getCurrentCanvas()
+      var object ={}
+      console.log(canvas)
+      canvas.forEachObject(function(obj) {
+     
+        if (obj.id === id) {
+          object = obj
+        }
+      })
+      return object}
+      this.debugTrace(this.debug, "**deleteEntry end")
+    
+    },
 
     /* -------------------- */
     /*  Zoom                */
@@ -1262,6 +1302,7 @@ export default {
           var y = (((yMax - yMin) / 12) * i) + yMin;       
           var valx = this.convert2unitX(x,canvas);
           arrX.push(valx);
+          
           arrY.push(Math.round(y * 10) / 10);
         }
       }else{
@@ -1363,7 +1404,7 @@ export default {
     /*Get type of element to draw */
     /******************************/
     getType: function () {
-      this.debugTrace(this.debug, "**getType start")
+     
       return $("#drawType").val();
     },
 

@@ -1,7 +1,7 @@
 {
   "name": "aeris-product-validation-vjs",
   "description": "data validation ",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "author": "Aeris",
   "private": false,
   "scripts": {

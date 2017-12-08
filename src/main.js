@@ -25,7 +25,7 @@ ljs.addAliases({
           "https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js",
           'https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.6.1/pikaday.js',
           'https://cdnjs.cloudflare.com/ajax/libs/jquery.perfect-scrollbar/0.7.0/js/perfect-scrollbar.min.js',
-          'https://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.7.16/fabric.js'
+          'https://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.7.20/fabric.js'
           ]
 })
 ljs.load('dep', function() {
