@@ -36,7 +36,7 @@
             <div id="tooltip" class="aeris-images-draw-tooltip" v-if="hovering.aeris">
               <ul>
               
-                <li v-for="tt in toArray(hovering.aeris)">
+                <li v-for="tt in toArray(hovering.aeris)" v-show="tt.value">
                   <strong> {{capitalize(tt.name)}}:</strong> {{tt.value}}</li>
               
               </ul>
@@ -225,7 +225,7 @@
         </div>
           </v-tab>
 
-          <v-tab title="Edit" :disabled="disableEdit">
+          <v-tab title="Edition" :disabled="disableEdit">
           Edit element value 
           <textarea rows="" cols="" placeholder="Comment" v-model="toolTipComment" ></textarea>
        
@@ -840,7 +840,7 @@ export default {
 
       /* On element unselection */
       canvas.on('before:selection:cleared', this.handleObjectUnselected.bind(this));
-    
+      canvas.on('object:added', this.handleObjectCreated.bind(this));
        /* On element selection */
       canvas.on('object:selected', this.handleObjectselected.bind(this));
 
@@ -912,6 +912,17 @@ export default {
        this.debugTrace(this.debug, "**handleKeyDown end")
     },100),
 
+     handleObjectCreated: function (ev) {
+      this.debugTrace(this.debug, "**object created start")
+       this.disableEdit = false
+      var canvas = this.getCurrentCanvas()
+      this.selectedElement = ev.target;
+     
+      var index =canvas.getObjects().indexOf(this.selectedElement)
+      canvas.setActiveObject(canvas.item(index));
+      
+       this.debugTrace(this.debug, "**object created end")
+    },
     /*****************************/
     /*manage handle Mouse Up event*/ 
     /*****************************/
@@ -960,7 +971,7 @@ export default {
     /********************************/
     handleMouseDown: debounce(function(ev) {
       
-      this.disableEdit = false
+      
       var _this = this;
       var canvas = this.getCurrentCanvas()
       this.start.x = parseInt(ev.e.clientX - this.canvasPosition.x);
@@ -1002,7 +1013,7 @@ export default {
       
       var canvas = this.getCurrentCanvas();
       var pointer = canvas.getPointer(ev.e);
-
+      var elt = ev.target;
       this.mousePosition.x = Math.round(pointer.x);
       this.mousePosition.y = Math.round(pointer.y);
       this.mousePosition.realY = this.computeY(Math.round(pointer.y), canvas);
@@ -1062,9 +1073,11 @@ export default {
         }
 
       } else if (this.hovering) {
+        if(elt.aeris.comment !=''|| elt.aeris.quality !=''){
         $('#tooltip').css({ left: Math.abs(ev.e.offsetX) + 25, top: Math.abs(ev.e.offsetY) + 25 });
+        $('#tooltip').css("padding","5px")
       }
-
+      }
       /* Change cursor when in panning mode */
       if (this.isPanning) {
         this.changeCursor('move', this.getCurrentCanvas());
@@ -1109,7 +1122,7 @@ export default {
       try {
         if (ev.target) {
           this.hovering = ev.target
-         
+        
         }
       } catch (ex) {
         /* Do nothing */
@@ -1118,7 +1131,7 @@ export default {
     },
 
     handleMouseOut: function(ev) {
-      
+       
       try {
         this.hovering = false;
       } catch (ex) {
@@ -1131,14 +1144,15 @@ export default {
     /*************************************/
     handleObjectUnselected: function(ev) {
       this.debugTrace(this.debug, "**handleObjectunSelected start")
-      this.disableEdit = true
+      this.lastSelectedElementId=''
+      
       this.tabName= "Legende"
       this.selectedElement = ev.target;
       this.elementInfos = this.selectedElement.aeris || {};
 
       /* Set tooltip data */
-      this.comment = this.toolTipComment || '';
-      this.quality = this.toolTipQuality || '';
+      this.selectedElement.aeris.comment = this.toolTipComment || '';
+      this.selectedElement.aeris.quality = this.toolTipQuality || '';
 
       /* On element deselection */
 
@@ -1152,19 +1166,17 @@ export default {
       /* Clear tooltip data */
       this.toolTipComment = '';
       this.toolTipQuality = '';
+      this.disableEdit = true
       this.debugTrace(this.debug, "**handleObjectunSelected end")
     },
     /*************************************/
     /*manage handle object selected event*/
     /*************************************/
     handleObjectselected: function(ev) {
-
-      this.disableEdit = false
       this.debugTrace(this.debug, "**handleObjectSelected start")
       this.selectedElement = ev.target;
-      console.log("Current : "+ this.selectedElement.id)
-      console.log("Last : " +this.lastSelectedElementId)
-   
+       this.disableEdit = false
+      var canvas = this.getCurrentCanvas()      
      
       if ( (this.selectedElement.id != this.lastSelectedElementId) && (this.lastSelectedElementId !='')){ 
         console.log("current tool tip : " + this.toolTipComment)
@@ -1177,13 +1189,16 @@ export default {
       }
  
       this.lastSelectedElementId= this.selectedElement.id
-      this.debugTrace(this.debug, "**handleObjectSelected end")
-      this.tabName = "Edit"
-      if ( this.selectedElement.aeris.comment != ''){
+      
+     
+      if(this.selectedElement.aeris != null) {
+          if  (this.selectedElement.aeris.comment != '') {
       this.toolTipQuality =this.selectedElement.aeris.quality;
       this.toolTipComment = this.selectedElement.aeris.comment
+      }
      }
-     
+     this.tabName = "Edition"
+     this.debugTrace(this.debug, "**handleObjectSelected end")
     },
 
     /*************************************/
@@ -2277,7 +2292,7 @@ input[type=number]::-webkit-outer-spin-button {
   position: absolute;
   color: #fff;
   border: 1px solid;
-  padding: 5px;
+  
   max-width: 150px;
   word-wrap: break-word;
   font-size: 12px;
@@ -2301,7 +2316,8 @@ input[type=number]::-webkit-outer-spin-button {
 .aeris-images-draw-tooltip ul {
   list-style: none;
   padding: 0;
-  margin: 0
+  margin: 0;
+
 }
 
 .aeris-images-draw-y-axis-container {
