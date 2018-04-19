@@ -1,7 +1,7 @@
 {
   "name": "aeris-product-validation-vjs",
   "description": "data validation ",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "author": "Aeris",
   "private": false,
   "scripts": {
@@ -11,9 +11,11 @@
   "dependencies": {
     "debounce": "^1.0.2",
     "exports-loader": "^0.6.4",
+    "highcharts": "^6.1.0",
     "vue": "^2.3.3",
     "vue-custom-element": "^1.2.1",
-    "vue-nav-tabs": "^0.5.4"
+    "vue-nav-tabs": "^0.5.4",
+    "vue-resource": "^1.5.0"
   },
   "devDependencies": {
     "@kazupon/vue-i18n-loader": "0.1.1",

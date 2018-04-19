@@ -6,19 +6,21 @@
       <div class="aeris-images-draw-canvas-cont">
         <div class="aeris-images-draw-y-axis-container">
           <!--type axe odronnées -->
-          <div  v-if="scaleYType =='log'" class="aeris-images-draw-y-axis" style="position: relative;">
-             <span  class="aeris-image-draw-log-axis" v-for="log in ymarks" 
-                :style="'z-index:'+log+';height:'+((Math.log10(log)*100)/Math.log10(500))+'%;'"> 
-                {{log}}
+          <!--<div  v-if="scaleYType =='log'" class="aeris-images-draw-y-axis" style="position: relative;">
+             <span  class="aeris-image-draw-log-axis" v-for="log in logScale" 
+                :style="'z-index:'+log+';height:'+((Math.log10(log)*100)/Math.log10(valueYmax))+'%;'"> 
+                {{round2(log)}}
              </span>
-          </div>
-
-          <div v-else class="aeris-images-draw-y-axis">
+          </div>-->
+         
+          <!--<div v-else class="aeris-images-draw-y-axis">
              <span  id="ymark"  class="aeris-images-draw-ymark" v-for="ym in ymarks">{{ym}}</span>
-          </div>
+          </div>-->
 
           <div class="aeris-images-draw-relative-container">
-            <div class="loader spinner" v-show="showSpinner"></div>
+            <div id="graph"></div>
+           
+            <!--<div class="loader spinner" v-show="showSpinner"></div>
             <div class="aeris-images-draw-zoom-panel">
               
               <button v-on:click="buttonZoom" data-amount="1"style="border-raduis:50%">
@@ -30,9 +32,14 @@
               </button>
             </div>
 
-              <div class="canvas-container" v-for="(elt,index,prop) in uuidArr" v-show="uuidDisplay === elt">
-                <canvas :id="'canvas_'+ elt" ></canvas>
+              <div class="canvas-container" v-for="(elt,index,prop) in uuidArr" v-show="uuidDisplay === elt" style="display:none">
+                <canvas :id="'canvas_'+ elt" style="display:none"></canvas>
               </div>
+              
+              
+
+              
+
             <div id="tooltip" class="aeris-images-draw-tooltip" v-if="hovering.aeris">
               <ul>
               
@@ -40,56 +47,19 @@
                   <strong> {{capitalize(tt.name)}}:</strong> {{tt.value}}</li>
               
               </ul>
-            </div>
+            </div>-->
           </div>
         </div>
-        <div  class="aeris-images-draw-x-axis">
+        <!--<div  class="aeris-images-draw-x-axis">
         
           <span  id="xmark" class="aeris-images-draw-xmark" v-for="xm in xmarks">{{xm}}</span>
           
-        </div>
+        </div>-->
         
         <div id="controls" class="aeris-images-draw-control-panel">
-          <!--<div class="buttons">
-  
-            <button  id="save" class="icon-button" type="button" v-on:click="saveCurrentCanvas()" title="Save" >
-              <i class="fa fa-floppy-o" ></i>
-            </button>
          
-            <button id="drawMode" class="icon-button" type="button" v-on:click="drawMode" title="Draw Mode (d)" v-bind:class="{active : isDrawing}">
-              <i class="fa fa-pencil-square-o"></i>
-            </button>
-            
-            <button id="panMode" class="icon-button" type="button" v-on:click="panMode" title="Pan Mode (p)" v-bind:class="{active : isPanning}">
-              <i class="fa fa-arrows-alt"></i>
-            </button>
-  
-            <button id="del" class="icon-button" type="button" v-on:click="deleteSelected()" title="Delete selection (del)">
-              <i class="fa  fa-eraser"></i>
-            </button>
-  
-            <button id="resetZoom" class="icon-button" type="button" v-on:click="resetZoom" title="Reset Zoom (z)">
-              <i class="fa fa-search"></i>
-            </button>
-  
-            <button id="help" class="icon-button" type="button" v-on:click="toggleHelp" title="Help">
-              <i class="fa fa-question"></i>
-            </button>
-
-            <button id="clearAll" class="icon-button" type="button" v-on:click="removeAllElement" title="Clear All Elements">
-              <i class="fa fa-trash"></i>
-            </button>
-  
-            <select name="drawType" id="drawType">
-              <option value="range" selected>Range</option>
-              <option value="zone">Zone</option>
-            </select>
-             <button id="ManualyInput" class="icon-button" type="button" v-on:click="panelOpen=!panelOpen" title="Input manualy">
-              <i class="fa fa-keyboard-o"></i>
-            </button>  
-          </div>-->
            
-          <!--<div class="coordinates">
+         <!--<div class="coordinates">
             
             <div>x: {{toDisplayX(mousePosition.x)}}, y: {{toDisplayY(mousePosition.realY)}} </div>
           </div>-->
@@ -112,18 +82,17 @@
                <i class="fa fa-plus"></i>
             </button>
         
-          <ul id="input" v-for="n in uuidArr"  v-show="uuid === n">
-            <li :id="'elt_'+ uuid+'_'+index" class="aeris-images-draw-control-input" v-for="(elt,index,prop) in manualElments[getCurrentCanvasId()]"  v-show ="panelOpen">
+          <!--<ul id="input" v-for="n in uuidArr"  v-show="uuid === n" style="display:none">
+            <li :id="'elt_'+ uuid+'_'+index" class="aeris-images-draw-control-input" v-for="(elt,index,prop) in manualElments[getCurrentCanvasId()]"  v-bind:class ="{elementSelected :SelectedElementId == elt.id  }">
            
           
             <div class="buttons">
 
-                <button id="viewResult" class="btn" type="button" v-on:click="drawEntry(elt)" title="View result">
-                  <i class="fa fa-paint-brush" aria-hidden="true"></i>
+                <button id="viewResult"  v-on:click="drawEntry(elt)" title="View result">
+                  <i class="fa fa-pencil" aria-hidden="true"></i>
                 </button>
 
-                <button id="viewId" class="btn" type="button"  :title="elt.id"> Id
-                </button>
+               
 
                 <select v-model="elt.elementType" >
                   <option value="range" selected>Range</option>
@@ -141,16 +110,16 @@
               <div class="input_time">
          
 <!--                <input type="number" step="1" min="0" max="23" placeholder="0" style="width : 30px"  onchange="if(this.value.length < 2) this.value = '0' + this.value;" /> h
--->                <input type="text" required pattern="(0[0-9]|1[0-9]|2[0-3])(:[0-5][0-9])" placeholder="hh:mm" style="width : 70px" v-model="elt.coords.start.x"/>
+            <input type="text" required pattern="(0[0-9]|1[0-9]|2[0-3])(:[0-5][0-9])" placeholder="hh:mm" style="width : 70px" v-model="elt.coords.start.x"/>
               <!--  <input type="number" step=".1" min="0" placeholder="x" style="width : 70px" v-model="elt.coords.start.x" /> -->
-                <input type="number" step=".1" min="0" placeholder="y" style="width : 70px"  v-if="elt.elementType !='range'"/>
+                <!--<input type="number" step=".1" min="0" placeholder="y" style="width : 70px"  v-if="elt.elementType !='range'"/>
               </div>
 
               <label>End</label>
               <div style="width : 100px">
                 <input type="text" required pattern="(0[0-9]|1[0-9]|2[0-3])(:[0-5][0-9])" placeholder="hh:mm" style="width : 70px" v-model="elt.coords.stop.x"/>
                <!-- <input id="chgwidth" type="number" step=".1" placeholder="x" style="width : 70px" v-model="elt.coords.stop.x"/>-->
-                <input type="number" step=".1" placeholder="y" style="width : 70px"v-if="elt.elementType !='range'"/>
+               <!-- <input type="number" step=".1" placeholder="y" style="width : 70px"v-if="elt.elementType !='range'"/>
               </div>
               
               <div class=" comment">
@@ -158,27 +127,27 @@
               </div>
 
                <div class="buttons">
-                <button id="delInput" class="btn" style="margin-left:20px" type="button" v-on:click="deleteEntry(elt.id,index)" title="Delete input">
-                  <i class="fa fa fa-trash" aria-hidden="true"></i>
+                <button id="delInput"  style="margin-left:20px" type="button" v-on:click="deleteEntry(elt.id,index)" title="Delete input">
+                  <i class="fa fa-times" aria-hidden="true"></i>
                 </button>
               </div>
                  
             </li>
           
-          </ul>
+          </ul>-->
          
           
       </div>
-      <aside class="aeris-images-draw-sidepanel">
+      <!--<aside class="aeris-images-draw-sidepanel">
             <button  id="save" class="icon-button" type="button" v-on:click="saveCurrentCanvas()" title="Save" >
               <i class="fa fa-floppy-o" ></i>
             </button>
-            <select style="font-weight: bold;background: #4765a0;border: none;width:3.3rem;height:2.9rem; font-size:11px;color:#fff"name="drawType" id="drawType">
+            <select v-model="drawType" style="font-weight: bold;background: #4765a0;border: none;width:3.3rem;height:2.9rem; font-size:11px;color:#fff"name="drawType" id="drawType">
               <option value="range" selected>Range</option>
               <option value="zone">Zone</option>
             </select>
             <button id="drawMode" class="icon-button" type="button" v-on:click="drawMode" title="Draw Mode (d)" v-bind:class="{active : isDrawing}">
-              <i class="fa fa-pencil-square-o"></i>
+              <i class="fa fa-pencil"></i>
             </button>
             
             <button id="panMode" class="icon-button" type="button" v-on:click="panMode" title="Pan Mode (p)" v-bind:class="{active : isPanning}">
@@ -195,21 +164,19 @@
   
         <!--    <button id="help" class="icon-button" type="button" v-on:click="toggleHelp" title="Help">
               <i class="fa fa-question"></i>
-            </button>-->
+            </button>
 
             <button id="clearAll" class="icon-button" type="button" v-on:click="removeAllElement" title="Clear All Elements">
               <i class="fa fa-trash"></i>
             </button>
   
             
-             <button id="ManualyInput" class="icon-button" type="button" v-on:click="panelOpen=!panelOpen" title="Input manualy">
-              <i class="fa fa-keyboard-o"></i>
-            </button> 
+            
             <div class="coordinates">
             
-            <!--<div style="font-size:9px;margin-rigth:3px">x: {{toDisplayX(mousePosition.x)}}, y: {{toDisplayY(mousePosition.realY)}} </div>-->
+          
           </div>
-            </aside>
+            </aside>-->
       <aside class="aeris-images-draw-sidepanel">
         
         <div class="legend" >
@@ -286,6 +253,7 @@ export default {
   data() {
 
     return {
+      valueYmax:0,
       tabName:'',
       pickerSetting: {
       headerShow: false,
@@ -425,21 +393,62 @@ export default {
       qualityList: [],
 
       uuidArr: {},
-      lastSelectedElementId:''
+      lastSelectedElementId:'',
+      drawType:"range",
+      flagQuality :"choose quality flag",
+      SelectedElementId : "",
+      options : {
+        chart: {
+        type: 'line',
+        zoomType: 'x'
+    },
+        data: {
+              
+              csv: '',
+            },
+            title:{
+        text:''
+    },
+    subTitle:{
+        text:''
+    },
+
+        plotOptions: {
+                    series: {
+                          visible: false,
+                    }
+                },
+}
 
     }
 
   },
 
   created: function () {
- 
+      console.log("created image draw...")
     moment.locale(this.lang);
     this.qualityList = qualityList;
     this.isDrawing = false
     this.isPanning = false
     this.panelOpen = false
     this.showSpinner= true
+    
     document.addEventListener('getFlage', this.getQualityFlag.bind(this));
+   /*this.$http.get("http://localhost:9080/actris-datacenter-rest/rest/quicklook/download?uuid=91440f71-9c3e-5d31-befc-2729873ce581&folder=/GROUND-BASED/P2OA_Pic-Du-Midi/NEPHE/NEPHE_RAW/2016&image=PDM_NEPH_20160730.csv").then(
+    (response)=>{
+                  console.log( "******************************");
+                 console.log(  response);
+                  console.log( "******************************");
+                  this.options.data.csv = response.bodyText
+                  //console.log(  this.options.data.csv);
+                  Highcharts.chart('graph', this.options,function(){
+        this.series[0].show();
+    });
+                },
+    (response)=>{
+                  console.log("error")
+    });*/
+
   },
 
   mounted: function () {
@@ -449,6 +458,7 @@ export default {
     // evite le redimensionnement au chargement du canvas 
   $('.aeris-images-draw-relative-container').css('min-height', 340);
     $('.aeris-images-draw-relative-container').css('min-width', 1000);
+    
   },
  
   watch: {
@@ -480,7 +490,22 @@ export default {
       
       this.bounds = {};
       var url = _this.service + _this.date_file; /* Modify with the UUID */
-      console.log("url :" + url)
+      this.$http.get("https://sedoo.aeris-data.fr/actris-datacenter-rest/rest/quicklook/download?uuid=91440f71-9c3e-5d31-befc-2729873ce581&folder=/GROUND-BASED/P2OA_Pic-Du-Midi/NEPHE/NEPHE_RAW/"+_this.date_file.substring(0, 4)+"&image=PDM_NEPH_"+_this.date_file.replace(/\D/g,'')+".csv").then(
+    (response)=>{
+                  console.log( "******************************");
+                 console.log(  response);
+                  console.log( "******************************");
+                  this.options.data.csv = response.bodyText
+                  //console.log(  this.options.data.csv);
+                  Highcharts.chart('graph', this.options,function(){
+        this.series[0].show();
+    });
+                },
+    (response)=>{
+                  console.log("error")
+    });
+      
+      console.log("date +++ :" +  _this.date_file.replace(/\D/g,''))
       $.ajax({
         url: url,
         method: 'get',
@@ -534,7 +559,7 @@ export default {
         
         _this.xmarks = arrX;
         _this.ymarks = _this.logScale;
-        //_this.logScale = [10,100,500],
+        
         _this.canvasManager()
        // affichage spinner 
        _this.showSpinner = false
@@ -684,6 +709,9 @@ export default {
 
       }.bind(this));
       this.setListeners(canvas)
+      this.pixelsBounds = this.getPixelBounds(canvas);
+      this.valueYmax=this.convert2unitY(this.computeY(this.pixelsBounds.tl.y,canvas),canvas);
+
       this.debugTrace(this.debug, "**resizeCanvas end")
     }, 100),
 
@@ -953,7 +981,21 @@ export default {
           scale: this.scale,
 
         };
-
+         this.manualElments[this.getCurrentCanvasId()].push({
+                      "comment":this.toolTipComment,
+                      "quality":this.toolTipQuality,
+                      "coords": {
+                                "start": {
+                                    "x":'' ,
+                                    "y":'' 
+                                  },
+                                  "stop": {
+                                    "x":'' ,
+                                    "y":''
+                                  }
+                      },
+                      "id":this.rect.id,
+                      "elementType":this.drawType});
         this.rect["aeris"] = {
           comment: "",
           quality: ""
@@ -961,7 +1003,8 @@ export default {
         this.toolTipComment =  this.rect["aeris"].comment
         var event = new CustomEvent('selectionEnd', { 'detail': obj })
         document.dispatchEvent(event);
-
+        console.log("obj : ")
+        console.log(obj)
       }
       canvas.renderAll();
       
@@ -1073,10 +1116,11 @@ export default {
         }
 
       } else if (this.hovering) {
+        if (elt != null){
         if(elt.aeris.comment !=''|| elt.aeris.quality !=''){
         $('#tooltip').css({ left: Math.abs(ev.e.offsetX) + 25, top: Math.abs(ev.e.offsetY) + 25 });
         $('#tooltip').css("padding","5px")
-      }
+      }}
       }
       /* Change cursor when in panning mode */
       if (this.isPanning) {
@@ -1177,7 +1221,7 @@ export default {
       this.selectedElement = ev.target;
        this.disableEdit = false
       var canvas = this.getCurrentCanvas()      
-     
+     this.SelectedElementId = this.selectedElement.id
       if ( (this.selectedElement.id != this.lastSelectedElementId) && (this.lastSelectedElementId !='')){ 
         console.log("current tool tip : " + this.toolTipComment)
         console.log("getDrawElementById Last : " +this.lastSelectedElementId)
@@ -1302,24 +1346,36 @@ export default {
       var xMax = this.convert2unitX(this.pixelsBounds.br.x,canvas);
       var yMin = this.convert2unitY(this.computeY(this.pixelsBounds.bl.y,canvas),canvas);
       var yMax = this.convert2unitY(this.computeY(this.pixelsBounds.tl.y,canvas),canvas);
-
+     
+      this.valueYmax =500
+      console.log("zoom : "+canvas.getZoom())
+      console.log("yMin : " + yMin)
+      console.log("yMax : " +yMax)
+      console.log("this.valueYmax value is : " + this.valueYmax)
       /* Generate markers */
       this.xmarks = [];
       this.ymarks = [];
       var arrX = [];
       var arrY = [];
+      var temp = this.logScale
+     
 
       if (this.scaleXType === "time"){
         var xMin = this.pixelsBounds.bl.x 
         var xMax = this.pixelsBounds.br.x
         for (var i = 1; i < 13; i++) {
-          var x = (((xMax - xMin) / 12) * i) + xMin;         
-          var y = (((yMax - yMin) / 12) * i) + yMin;       
+          var x = (((xMax - xMin) / 12) * i) + xMin;          
           var valx = this.convert2unitX(x,canvas);
           arrX.push(valx);
-          
-          arrY.push(Math.round(y * 10) / 10);
         }
+        /*for(var j=0; j<3;j++){
+          temp[j] = temp[j] +(yMin -1 )
+        }
+         var ratio = Math.log10(500)/ canvas.height;
+         var prop = Math.pow(10, y * ratio)
+         temp.splice((temp.length -1),1,this.valueYmax)
+         arrY= temp*/
+         console.log("logScale : "+ this.logScale )
       }else{
         for (var i = 1; i < 11; i++) {
           var x = (((xMax - xMin) / 10) * i) + xMin;
@@ -1420,7 +1476,7 @@ export default {
     /******************************/
     getType: function () {
      
-      return $("#drawType").val();
+      return this.drawType//$("#drawType").val();
     },
 
     /************************************/
@@ -1742,6 +1798,8 @@ export default {
     /**********************************/
     getQualityFlag : function(ev){
       this.debugTrace(this.debug, "**getQualityFlag start")
+      console.log("ev.detail :")
+      console.log(ev.detail)
       this.qualityList = []
       var data = ev.detail
 
@@ -2451,9 +2509,10 @@ input[type=number]::-webkit-outer-spin-button {
 
 .aeris-images-draw-control-input input,
 .aeris-images-draw-control-input select,
-.aeris-images-draw-control-input option {
+.aeris-images-draw-control-input option, 
+.aeris-images-draw-control-input button{
   color: inherit;
-  background: transparent;
+  background: white;
   outline: none;
   border: 1px solid #ddd;
   color:#555;
@@ -2467,8 +2526,8 @@ input[type=number]::-webkit-outer-spin-button {
 
 .spinner{
     position: absolute;
-    height: 20px;
-    width: 20px;
+    height: 10px;
+    width: 10px;
     top: 50%;
     left: 50%;
     margin-left: -50px;
@@ -2544,8 +2603,8 @@ input[type=number]::-webkit-outer-spin-button {
   border-radius: 50%;
   border-top: 16px solid #4765a0;
   border-bottom: 16px solid #4765a0;
-  width: 120px;
-  height: 120px;
+  width: 60px;
+  height: 60px;
   -webkit-animation: spin 2s linear infinite;
   animation: spin 2s linear infinite;
 }
@@ -2559,5 +2618,12 @@ input[type=number]::-webkit-outer-spin-button {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+.elementSelected {
+  background-color: #f5f5f5;
+}
+.elementUnselected select textarea {
+  
+
 }
 </style>

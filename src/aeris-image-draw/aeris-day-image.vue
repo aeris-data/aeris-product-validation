@@ -1,8 +1,11 @@
+       
+
 <template>
   <div class ="aeris-day-image-host" >
     <div class="aeris-day-image-component-container">
-       <aeris-images-draw id="viewer"   service='https://sedoo.aeris-data.fr/actris-datacenter-rest/rest/validation/dailydetail?uuid=91440f71-9c3e-5d31-befc-2729873ce581&day='  ></aeris-images-draw>
-      <!--<aeris-images-draw id="viewer"   service=''  ></aeris-images-draw>-->
+     <!-- <aeris-images-draw id="viewer"   service=' http://localhost:9080/actris-datacenter-rest/rest/validation/dailydetail?uuid=91440f71-9c3e-5d31-befc-2729873ce581&day='  ></aeris-images-draw>-->
+      
+    <aeris-images-draw id="viewer"   service='https://sedoo.aeris-data.fr/actris-validation-rest/rest/validation/daily?uuid=91440f71-9c3e-5d31-befc-2729873ce581&day='  ></aeris-images-draw>
       <div class="aeris-day-image-calendar-container">
         <i class="fa fa-2x fa-angle-left" v-on:click="prevDay"></i>
         <input class="aeris-day-image-datepicker-input" id="datepicker"  v-model="selectedDay" @blur="getinputVal()" >
@@ -14,11 +17,11 @@
          
           <div class="aeris-day-image-day-element" v-if="showql" v-on:click="getElementFromClick(day) " v-for="(day,index) in days" :checked="checkFirst(index)">
             <input :id="'ql'+index" class="input-radio" type="radio" name="quicklooks">
-            <label class="aeris-day-image-quicklook-label">
+            <!--<label class="aeris-day-image-quicklook-label">
               <img style="border:solid 1px" class="aeris-day-image-quicklook" :src="day.media.content" :alt="day.media.category">
-              <!--<span>{{formatItemHour(day.date)}}</span>-->
+              <!-<span>{{formatItemHour(day.date)}}</span>-
              
-            </label>
+            </label>-->
           </div>
         </div>
       </div>
@@ -29,29 +32,25 @@
 
 <script>
  
-//const DATE_FORMAT = 'LL';
-/*const DATE_FORMAT = 'MMMM YYYY';*/
+const DATE_FORMAT = 'LL';
 export default {
-
   props: {
-    service:"",
-
+    service: {
+      type: String,
+      default: ''
+    },
     collection: {
       type: String,
       default: ''
     },
-
     lang: {
       type: String,
       default: 'fr',
     },
-   date_format:""
+   
   },
-
   data() {
-
     return {
-
       debug :{
         type:Boolean,
         default:false
@@ -59,53 +58,43 @@ export default {
       showql: {
         type: Boolean,
       },
-
       days: {
         type: Array,
         default: []
       },
-
       selectedDay: {
         type: String,
-        default: ''
+        default: '10 avril 2018'
       },
-
       picker: {
         type: Object,
       },
-
       queryParams: {
         type: Object,
         default: {}
       },
-
       hideTodayBtn: {
         type: Boolean,
       },
-
       totalResults : {
         type:Number,
       },
-
       uuid_day : {
         type : String,
       }
-
-     
     }
   },
-
   created: function () {
-    this.date_format ="LL"
     this.debugTrace(this.debug, "**created start")
+    //this.queryServiceDayComp();
     this.showql = false
     moment.locale(this.lang);
-    this.selectedDay = moment(new Date());
-    var selectedMoment = moment(this.selectedDay, this.date_format);
-    this.selectedDay = selectedMoment.format(this.date_format);
+    this.selectedDay = '10 avril 2018';
+   /* this.selectedDay = moment(new Date());
+    var selectedMoment = moment(this.selectedDay, DATE_FORMAT);
+    this.selectedDay = selectedMoment.format(DATE_FORMAT);*/
     this.debugTrace(this.debug, "**created end")
   },
-
   mounted: function () {
     this.debugTrace(this.debug, "**mounted start")
     this.viewElement = document.querySelector('aeris-images-draw');
@@ -114,19 +103,16 @@ export default {
     var monthsArray = [];
     var daysArray = [];
     var shortDaysArray = [];
-
     for (var i = 0; i < 12; i++) {
       monthsArray.push(this.capitalize(moment().month(i).format('MMMM')));
     }
-
     for (var i = 0; i < 7; i++) {
       daysArray.push(this.capitalize(moment().day(i).format('dddd')));
       shortDaysArray.push(this.capitalize(moment().day(i).format('ddd')));
     }
-
     this.picker = new Pikaday({
       field: this.$el.querySelector("#datepicker"),
-      format: this.date_format,
+      format: DATE_FORMAT,
       maxDate: new Date(),
       firstDay: 1,
       defaultDate: new Date(),
@@ -141,36 +127,19 @@ export default {
     });
     this.debugTrace(this.debug, "**mounted end")  
   },
-
   watch: {
-
     selectedDay: (function () {
       
       this.viewElement.setAttribute("date_file", this.convert_Date_Format());
       this.queryServiceDayComp();
       var today = moment(new Date());
-      var selected = moment(this.selectedDay, this.date_format);
+      var selected = moment(this.selectedDay, DATE_FORMAT);
       this.hideTodayBtn = selected.isSame(today, 'day') ? true : false;
       return this.hideTodayBtn;
-
     }),
-
-    service : function () {
-      this.queryServiceDayComp();
-    },
-
-    date_format : function() {
-       moment.locale("fr");
-    this.selectedDay = moment(new Date());
-    var selectedMoment = moment(this.selectedDay, this.date_format);
-     this.selectedDay = selectedMoment.format(this.date_format);
    
- 
-    } 
   },
-
   methods: {
-
     /*************************/
     /* Add debug basic trace */
     /*************************/
@@ -180,25 +149,19 @@ export default {
         console.log(txt)
       }
     },
-    
-    getCurrentDateformat : function() {
-      return this.date_format
-    },
     /************************************************************/
     /* get current value from input text field of the datepicker*/
     /************************************************************/
     getinputVal : function () {
       this.selectedDay = document.getElementById('datepicker').value
     },
-
     /********************************************************************/
     /* Set current selected day to today (on display and in datepicker) */
     /********************************************************************/
     goToToday: function () {
       this.picker.setDate(new Date());
-      this.selectedDay = this.picker.getMoment().format(this.date_format);
+      this.selectedDay = this.picker.getMoment().format(DATE_FORMAT);
     },
-
     /*************************************************/
     /* Intercept events and add granule informations */
     /*************************************************/
@@ -207,13 +170,11 @@ export default {
       this.$.viewer.addEventListener('selectionModified', function (ev) {
         ev.detail.granule = this.selectedElem;
       }.bind(this));
-       
       this.$.viewer.addEventListener('selectionEnd', function (ev) {
         ev.detail.granule = this.selectedElem;
       }.bind(this))
       this.debugTrace(this.debug, "**setListenersDayComp end")
     },
-
     /************************************************/
     /* Query service to get images for a given date */
     /************************************************/
@@ -232,7 +193,6 @@ export default {
         _this.days = data.granules;
         _this.showql = true
         _this.totalResults = data.totalResults
-
         if(_this.totalResults == 0){
           _this.uuid_day ="no-graph"
        
@@ -255,35 +215,28 @@ export default {
       });
       this.debugTrace(this.debug, "**queryServiceDayComp end")
     },
-
     /******************************************************/
     /* Display the selected element in the view component */
     /******************************************************/
     showElement: function (selectedElem) {
-      this.debugTrace(this.debug, "**showElement start" + this.selectedElem.uuid)
+      this.debugTrace(this.debug, "**showElement start")
       this.viewElement.setAttribute("uuid", this.selectedElem.uuid);
-     
     },
-
     /* -------------------- */
     /*  Utilities           */
     /* -------------------- */
-
-
     /**************************************************/
     /* Check if this is the first element in the list */
     /**************************************************/
     checkFirst: function (index) {
       return index === 0;
     },
-
     /***************************/
     /* Capitalize given string */
     /***************************/
     capitalize: function (str) {
       return str.substring(0, 1).toUpperCase() + str.substr(1).toLowerCase();
     },
-
     /******************************************/
     /* Define the selected element from click */
     /******************************************/
@@ -293,40 +246,36 @@ export default {
       this.selectedElem = element;
       this.showElement();
     },
-
     /****************************************/
     /* Format time displayed under elements */
     /****************************************/
     formatItemHour: function (date) {
       return moment(date).format('LT (Z)');
     },
-
     /******************************************/
     /* subtract a day to current selected day */
     /******************************************/
     prevDay: function () {
       this.debugTrace(this.debug, "**prevDay start")
-      var selectedMoment = moment(this.selectedDay, this.date_format);
-      this.selectedDay = selectedMoment.subtract(1, 'days').format(this.date_format);
+      var selectedMoment = moment(this.selectedDay, DATE_FORMAT);
+      this.selectedDay = selectedMoment.subtract(1, 'days').format(DATE_FORMAT);
     },
-
     /*************************************/
     /* Add a day to current selected day */
     /*************************************/
     nextDay: function () {
       this.debugTrace(this.debug, "**nextDay start")
-      var selectedMoment = moment(this.selectedDay, this.date_format);
+      var selectedMoment = moment(this.selectedDay, DATE_FORMAT);
       if (selectedMoment.isBefore(moment(new Date()), 'day')) {
-        this.selectedDay = selectedMoment.add(1, 'days').format(this.date_format);
+        this.selectedDay = selectedMoment.add(1, 'days').format(DATE_FORMAT);
       }
     },
-
     /************************************/
     /*Convert date format => YYYY-MM-DD */
     /************************************/
     convert_Date_Format : function () {
       console.log("this.selectedDay : "+moment(this.selectedDay, 'DD MMMMMMM YYYY').format('YYYY-MM-DD'))
-      return moment(this.selectedDay, 'DD MMMMMMM YYYY').format('YYYY-MM-DD')
+      return moment(this.selectedDay, 'DD MMMMMMM YYYY').format('YYYY-MM-DD')//moment(this.selectedDay).format("YYYY-MM-DD")
     }
   }
 }
@@ -340,14 +289,14 @@ export default {
   padding: 0;
   color: #333;
   font-family: 'Open Sans', sans-serif;
+  /*border: 1px solid #ddd;*/
   overflow: auto;
   z-index:0;
+/*  box-shadow: 8px 8px 20px #aaa; */
 }
-
 .aeris-day-image-host * {
   box-sizing: border-box
 }
-
 .aeris-day-image-component-container {
   display: -ms-flexbox;
   display: flex;
@@ -359,7 +308,6 @@ export default {
   align-items: center;
  
 }
-
 .aeris-day-image-calendar-container {
   display: -ms-flexbox;
   display: flex;
@@ -372,7 +320,6 @@ export default {
   -ms-user-select: none;
   user-select: none
 }
-
 .aeris-day-image-calendar-container .aeris-day-image-datepicker-input {
   text-align: center;
   font-size: 1.2em;
@@ -382,16 +329,13 @@ export default {
   border: none;
   cursor: pointer
 }
-
 .aeris-day-image-calendar-container .fa {
   cursor: pointer
 }
-
 aeris-images-draw {
   border-bottom: 1px solid #ddd;
   margin-bottom: 10px
 }
-
 .aeris-day-image-today-button {
   width: 100px;
   height: 30px;
@@ -402,15 +346,12 @@ aeris-images-draw {
   text-align: center;
   line-height: 30px;
   border: 1px solid;
-  cursor: pointer;
-  padding: inherit;
+  cursor: pointer
 }
-
 .aeris-day-image-today-button:hover {
   background-color: #333;
   color: #fff
 }
-
 .aeris-day-image-day-elements {
   position: relative;
   display: -ms-inline-flexbox;
@@ -423,28 +364,23 @@ aeris-images-draw {
   overflow-x: auto;
   overflow-y: hidden
 }
-
 .aeris-day-image-day-elements .aeris-day-image-day-element {
   text-align: center
 }
-
 .aeris-day-image-day-elements .aeris-day-image-day-element img {
   opacity: 0.6;
   transition: 0.3s
 }
-
 .aeris-day-image-day-elements .aeris-day-image-day-element img:hover {
   cursor: pointer;
   opacity: 1
 }
-
 .aeris-day-image-day-elements .aeris-day-image-quicklook {
   display: block;
   width: 200px;
   height: auto;
   margin: 0 5px
 }
-
 .aeris-day-image-day-elements .aeris-day-image-quicklook-label {
   display: block;
   margin: 5px;
@@ -452,20 +388,13 @@ aeris-images-draw {
   font-size: 12px;
   border-bottom: 3px solid transparent
 }
-
 .aeris-day-image-day-elements .input-radio {
   display: none
 }
-
-.aeris-day-image-day-elements 
-.input-radio:checked~.quicklook-label {
+.aeris-day-image-day-elements .input-radio:checked~.quicklook-label {
   border-bottom: 3px solid rgba(255, 165, 0, 0.6)
 }
-
-.aeris-day-image-day-elements
-.input-radio:checked~.quicklook-label img {
+.aeris-day-image-day-elements .input-radio:checked~.quicklook-label img {
   opacity: 1
 }
-
-
 </style>

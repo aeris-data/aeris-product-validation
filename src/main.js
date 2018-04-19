@@ -4,13 +4,18 @@ import Vue from 'vue';
 
 import vueCustomElement from 'vue-custom-element'
 import vueNavTabs from 'vue-nav-tabs'
-Vue.use(vueCustomElement);
-Vue.use(vueNavTabs);
+import vueResource from 'vue-resource'
+import Highcharts from 'highcharts';
 
 import AerisValidationProduct from './aeris-validation-product/aeris-validation-product.vue';
 import AerisDrawImage from './aeris-image-draw/aeris-images-draw.vue';
 import AerisDayImage from './aeris-image-draw/aeris-day-image.vue';
 import AerisInstrumentSelect from './aeris-image-draw/aeris-instrument-select.vue';
+
+Vue.use(vueCustomElement);
+Vue.use(vueNavTabs);
+Vue.use(Highcharts);
+Vue.use(vueResource);
 
 
 ljs.addAliases({
@@ -25,7 +30,12 @@ ljs.addAliases({
           "https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js",
           'https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.6.1/pikaday.js',
           'https://cdnjs.cloudflare.com/ajax/libs/jquery.perfect-scrollbar/0.7.0/js/perfect-scrollbar.min.js',
-          'https://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.7.20/fabric.js'
+          'https://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.7.20/fabric.js',
+          "https://unpkg.com/vue/dist/vue.min.js",
+          "https://unpkg.com/highcharts/highcharts.js",
+           //<!-- vue-highcharts should be load after Highcharts -->
+           "https://cdnjs.cloudflare.com/ajax/libs/highcharts/6.0.7/js/modules/data.js",
+           "https://code.highcharts.com/modules/exporting.js"
           ]
 })
 ljs.load('dep', function() {

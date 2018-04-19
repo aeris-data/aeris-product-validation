@@ -8,19 +8,21 @@
           </h3>
         </header>
         <div class="aeris-validation-product-list">
-          <div  class="aeris-validation-product-item" v-for="serie in serieListe"   @click="activeSerie " :data-uuid ="serie.uuid" :data-date-format="serie.date_format">
+          <div  class="aeris-validation-product-item" :class="{serieActive:selected == index}" v-for="(serie,index) in instrumentListeUUIDByName"   @click="selected = index;activeSerie(serie) " :data-uuid ="serie.uuid" :data-date-format="serie.date_format">
             {{serie.name}} 
           </div>
         </div>
       </div>
-      <div class="aeris-validation-product-validation-panel" v-show="displayValidation">
+      
+      <div class="aeris-validation-product-validation-panel" >
         <header style="background: #4765a0;">
           <h3>
             <i class="fa fa-cogs"></i>&nbsp {{SerieTitle}}
           </h3>
         </header>
-        <aeris-day-images lang="fr" ></aeris-day-images>
-        <!--"https://sedoo.aeris-data.fr/actris-datacenter-rest/rest/validation/daily?uuid=91440f71-9c3e-5d31-befc-2729873ce581&day="-->
+        <aeris-day-images service="https://sedoo.aeris-data.fr/actris-datacenter-rest/rest/validation/daily?uuid=91440f71-9c3e-5d31-befc-2729873ce581&day="lang="fr" ></aeris-day-images>
+<!--        <aeris-day-images service="http://localhost:9080/actris-datacenter-rest/rest/validation/daily?uuid=91440f71-9c3e-5d31-befc-2729873ce581&day="lang="fr" ></aeris-day-images>
+-->        <!--"https://sedoo.aeris-data.fr/actris-datacenter-rest/rest/validation/daily?uuid=91440f71-9c3e-5d31-befc-2729873ce581&day="-->
       </div>
     </div>
 
@@ -52,41 +54,35 @@ export default {
         type:Boolean,
         default:false
       },
-
+      instrumentListeUUIDByName:[],
+      instrumentUUIDListe:[],
+      instrumentNameListe:[],
       isclassActive: false,
-
+      instrumentInfo :"",
       SerieTitle:"",
-
-      serieListe :[
-                   { name: "Nephelometer time series for the Pic du Midi (65) station", uuid: "91440f71-9c3e-5d31-befc-2729873ce581", date_format:'LL' },
-                   { name: "Radar VHF time series for the Centre de Recherche Atmospheriques de Lannemezan (65) station", uuid :"4f92fdf2-d518-52a3-897e-2df1ed7af750",date_format:'MMMM YYYY'}                    
-      ],
-      
       orcid : {
         type:String,
-        
       },
-      
+      selected:0,
+      toto:[]
     }
   },
  
 
- 
-
   created : function () {
-  
-  this.orcid="none"
-  this.displayValidation=false
 
-  
-  document.addEventListener("aerisOrcidResponse", this.checkOrcidForvalidation.bind(this));
-  var eventOrcid = new CustomEvent('aerisOrcidRequest');
-  document.dispatchEvent(eventOrcid)
-},
+    this.orcid="none"
+    this.displayValidation=false
+    document.addEventListener("aerisOrcidResponse", this.checkOrcidForvalidation.bind(this));
+    var eventOrcid = new CustomEvent('aerisOrcidRequest');
+    document.dispatchEvent(eventOrcid)
+    
+   
+  },
 
-
-
-  
+  mounted : function () {
+         
+  },
 
   methods : {
 
@@ -95,43 +91,72 @@ export default {
       if (typeof(e.detail.user.orcid) != "undefined") {
         console.log("orcid : " + e.detail.user.orcid)
         this.orcid = e.detail.user.orcid
- 
+        var urlServiceInstrumentUUIIDbyOrcid ="https://sedoo.aeris-data.fr/actris-datacenter-rest/rest/admin/uuids?orcid="+ this.orcid
+        this.$http.get(urlServiceInstrumentUUIIDbyOrcid).then(
+          (response)=>{ 
+                        this.instrumentUUIDListe =response.body;                       
+                        for(var i=0;i< response.body.length;i++){
+                          this.getInstrumentInfo(this.instrumentUUIDListe[i]) 
+                        } 
+                      },
+          (response)=>{
+                        console.log("error")
+          });
       } else {
         console.log("orcid is undefined")
       }
     },
   
-    activeSerie: function(e) {
-      var clickedElement = e.target;
-      $(clickedElement).siblings().removeClass('serieActive');
-      $(clickedElement).addClass('serieActive');
-
-
-     
-
-      this.SerieTitle = $(clickedElement).text()
-      var _this=this
-      this.serieUuid= clickedElement.getAttribute("data-uuid");
-      console.log(this.serieUuid)
-      var uuidPara =  "uuid="+this.serieUuid+"&day="
+    activeSerie: function(serie) {
+     console.log("active serie ******************************")
+     console.log(serie)
+      this.SerieTitle = serie.name
+      console.log("uuid of selected serie : "+ serie.uuid)
+      var uuidPara =  "uuid="+serie.uuid+"&day="
+                        
+      //this.serviceUrl="http://localhost:9080/actris-datacenter-rest/rest/validation/daily?"+uuidPara
       this.serviceUrl="https://sedoo.aeris-data.fr/actris-datacenter-rest/rest/validation/daily?"+uuidPara
       this.viewElement = document.querySelector('aeris-day-images');
       this.viewElement.setAttribute("service", this.serviceUrl);
-      this.viewElement.setAttribute("date_format", clickedElement.getAttribute("data-date-format"));
-      this.displayValidation=true
-      this.getLabelValue();
+     // this.viewElement.setAttribute("date_format", clickedElement.getAttribute("data-date-format"));
+      this.getLabelValue(serie.uuid);
     },
+
+    getInstrumentInfo : function (uuidInstrument) {
+      var urlInstrumentInfo = "https://sedoo.aeris-data.fr/catalogue/rest/metadatarecette/id/"+uuidInstrument 
+      var obj ={}
+      this.$http.get(urlInstrumentInfo).then(
+          (response)=>{ 
+                        this.instrumentNameListe.push(response.body.resourceTitle.en)                       
+                        obj= {name :response.body.resourceTitle.en,uuid :uuidInstrument}
+                        this.instrumentListeUUIDByName.push(obj)                       
+                        console.log(this.instrumentListeUUIDByName)    
+                        this.activeSerie(this.instrumentListeUUIDByName[0])                      
+                      },
+          (response)=>{
+                        console.log("error")
+          });   
+         
+    },
+
     
-     getUuid : function (uuid) {
-       return uuid
-     },
 
     getLabelValue : function(uuid){
      
      var url_o = "https://sedoo.aeris-data.fr/actris-datacenter-rest/rest/quality/flags/"
-     
-     var service = url_o + "91440f71-9c3e-5d31-befc-2729873ce581"
-      $.when(
+     var service = url_o + uuid//"91440f71-9c3e-5d31-befc-2729873ce581"
+    $.when( this.$http.get(service).then(
+          (response)=>{ 
+                        console.log("inside getlabelValue")
+                        var event = new CustomEvent('getFlage', { 'detail': response.body })
+                        document.dispatchEvent(event);
+                      
+                      },
+          (response)=>{
+                        console.log("error")
+          }))
+             
+      /*$.when(
             $.ajax({
             url: service,
             data: "",
@@ -146,15 +171,10 @@ export default {
         })).then(function (resp){       
             var event = new CustomEvent('getFlage', { 'detail': resp })
             document.dispatchEvent(event);
-            });
+            });*/
             
     }
-  
-
   },
-
-  
-
 }
 </script>
 
