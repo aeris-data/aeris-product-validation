@@ -5,7 +5,7 @@
     <div class="aeris-day-image-component-container">
      <!-- <aeris-images-draw id="viewer"   service=' http://localhost:9080/actris-datacenter-rest/rest/validation/dailydetail?uuid=91440f71-9c3e-5d31-befc-2729873ce581&day='  ></aeris-images-draw>-->
       
-    <aeris-images-draw id="viewer"   service='https://sedoo.aeris-data.fr/actris-validation-rest/rest/validation/daily?uuid=91440f71-9c3e-5d31-befc-2729873ce581&day='  ></aeris-images-draw>
+    <aeris-images-draw id="viewer"   service='https://sedoo.aeris-data.fr/actris-validation-rest/rest/validation/dailydetail?uuid=91440f71-9c3e-5d31-befc-2729873ce581&day='  ></aeris-images-draw>
       <div class="aeris-day-image-calendar-container">
         <i class="fa fa-2x fa-angle-left" v-on:click="prevDay"></i>
         <input class="aeris-day-image-datepicker-input" id="datepicker"  v-model="selectedDay" @blur="getinputVal()" >
@@ -89,7 +89,7 @@ export default {
     //this.queryServiceDayComp();
     this.showql = false
     moment.locale(this.lang);
-    this.selectedDay = '10 avril 2018';
+    this.selectedDay = '23 avril 2018';
    /* this.selectedDay = moment(new Date());
     var selectedMoment = moment(this.selectedDay, DATE_FORMAT);
     this.selectedDay = selectedMoment.format(DATE_FORMAT);*/
@@ -189,20 +189,20 @@ export default {
         method: 'get',
         dataType: 'json'
       }).done(function (data) {
-       
+           _this.uuid_day = _this.getId()
         _this.days = data.granules;
         _this.showql = true
         _this.totalResults = data.totalResults
-        if(_this.totalResults == 0){
-          _this.uuid_day ="no-graph"
+        /*if(_this.totalResults == 0){
+          _this.uuid_day =_this.getId
        
         }else{
-          _this.uuid_day =_this.days[0].uuid
-        }
+          _this.uuid_day =_this.getId//_this.days[0].uuid
+        }*/
   
         window.setTimeout(function () {
          
-          _this.selectedElem = _this.days[0];
+          _this.selectedElem =_this.uuid_day//_this.days[0];
           _this.viewElement.setAttribute("totalResults", data.totalResults);
           _this.viewElement.setAttribute("uuid",  _this.uuid_day);        
            // _this.showElement( _this.selectedElem);//if (_this.days.length) _this.showElement( _this.uuid_day);
@@ -269,6 +269,16 @@ export default {
       if (selectedMoment.isBefore(moment(new Date()), 'day')) {
         this.selectedDay = selectedMoment.add(1, 'days').format(DATE_FORMAT);
       }
+    },
+     getId: function () {
+     
+      function s4() {
+        return Math.floor((1 + Math.random()) * 0x10000)
+          .toString(16)
+          .substring(1);
+      }
+      return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+        s4() + '-' + s4() + s4() + s4();
     },
     /************************************/
     /*Convert date format => YYYY-MM-DD */

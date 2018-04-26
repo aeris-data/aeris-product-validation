@@ -138,45 +138,45 @@
          
           
       </div>
-      <!--<aside class="aeris-images-draw-sidepanel">
-            <button  id="save" class="icon-button" type="button" v-on:click="saveCurrentCanvas()" title="Save" >
+      <aside class="aeris-images-draw-sidepanel">
+          <!--  <button  id="save" class="icon-button" type="button" v-on:click="saveCurrentCanvas()" title="Save" >
               <i class="fa fa-floppy-o" ></i>
-            </button>
-            <select v-model="drawType" style="font-weight: bold;background: #4765a0;border: none;width:3.3rem;height:2.9rem; font-size:11px;color:#fff"name="drawType" id="drawType">
+            </button>-->
+           <!-- <select v-model="drawType" style="font-weight: bold;background: #4765a0;border: none;width:3.3rem;height:2.9rem; font-size:11px;color:#fff"name="drawType" id="drawType">
               <option value="range" selected>Range</option>
               <option value="zone">Zone</option>
-            </select>
+            </select>-->
             <button id="drawMode" class="icon-button" type="button" v-on:click="drawMode" title="Draw Mode (d)" v-bind:class="{active : isDrawing}">
               <i class="fa fa-pencil"></i>
             </button>
             
-            <button id="panMode" class="icon-button" type="button" v-on:click="panMode" title="Pan Mode (p)" v-bind:class="{active : isPanning}">
+           <!-- <button id="panMode" class="icon-button" type="button" v-on:click="panMode" title="Pan Mode (p)" v-bind:class="{active : isPanning}">
               <i class="fa fa-arrows-alt"></i>
-            </button>
+            </button>-->
   
-            <button id="del" class="icon-button" type="button" v-on:click="deleteSelected()" title="Delete selection (del)">
+           <!-- <button id="del" class="icon-button" type="button" v-on:click="deleteSelected()" title="Delete selection (del)">
               <i class="fa  fa-eraser"></i>
             </button>
-  
-            <button id="resetZoom" class="icon-button" type="button" v-on:click="resetZoom" title="Reset Zoom (z)">
+  -->
+            <!--<button id="resetZoom" class="icon-button" type="button" v-on:click="resetZoom" title="Reset Zoom (z)">
               <i class="fa fa-search"></i>
             </button>
   
-        <!--    <button id="help" class="icon-button" type="button" v-on:click="toggleHelp" title="Help">
+            <button id="help" class="icon-button" type="button" v-on:click="toggleHelp" title="Help">
               <i class="fa fa-question"></i>
             </button>
 
             <button id="clearAll" class="icon-button" type="button" v-on:click="removeAllElement" title="Clear All Elements">
               <i class="fa fa-trash"></i>
             </button>
-  
+  -->
             
             
             <div class="coordinates">
             
           
           </div>
-            </aside>-->
+            </aside>
       <aside class="aeris-images-draw-sidepanel">
         
         <div class="legend" >
@@ -188,7 +188,8 @@
         <vue-tabs v-model="tabName">
           <v-tab title="Legende">
            <div class="legend" >
-          <img src="https://dummyimage.com/200x100/ddd/000.jpg&text=no+legende+available+">
+             <div id="customLegend"> </div>
+         <!-- <img src="https://dummyimage.com/200x100/ddd/000.jpg&text=no+legende+available+">-->
         </div>
           </v-tab>
 
@@ -199,7 +200,7 @@
           
             <select name="quality" v-model="toolTipQuality" >
               <option value="" selected disabled>Choose quality flag</option>
-              <option :value="item.code" v-for="item in qualityList">{{item.label}}</option>
+              <option :value="'('+item.code+') '+item.label" v-for="item in qualityList">{{item.label}}</option>
             </select>
              
           </v-tab>
@@ -211,6 +212,24 @@
      <!--   </div>-->
 
       </aside>
+   <div id="toolTipBox">
+    <label class="tooltipHeader">Resume</label>
+    <br />
+    <label class="tooltipLabel">Quality flag:</label>
+    <label id="title" class="tooltipText"></label>
+    
+    <br />
+    <label class="tooltipLabel">Comment:</label>
+    <label id="targetPrice" class="tooltipText"></label>
+    <br />
+    <label class="tooltipLabel">Validateur:</label>
+    <label id="rating" class="tooltipText"></label>
+    <br />
+    <label class="tooltipLabel">Date:</label>
+    <label id="ltGrowth" class="tooltipText"></label>
+    <br />
+    
+</div>
     </div>
     
   </div>
@@ -366,7 +385,7 @@ export default {
       uuidDisplay: {
         type: String,
       },
-      disableEdit : true,
+      disableEdit : false,
       manualElments: {},
 
       blankElment: {"comment": "",
@@ -397,29 +416,47 @@ export default {
       drawType:"range",
       flagQuality :"choose quality flag",
       SelectedElementId : "",
-      options : {
+      titi:true,
+      highcharts: require('highcharts'),
+      chart:null,
+      ZoomTypeX: 'x',
+      ZoomTypeXy: 'xy',
+      rectangle:null,
+      renderer : null,
+      chart:null,
+      plotLinesAndBands:null,
+      id:95,
+      options: {
         chart: {
-        type: 'line',
-        zoomType: 'x'
+          zoomType: '',
+          events: this.createOptions(this)
+        },
+        legend: {
+        enabled: false
     },
-        data: {
-              
-              csv: '',
+         mapNavigation: {
+                enabled: true,
+                enableButtons: false
             },
-            title:{
-        text:''
-    },
-    subTitle:{
-        text:''
-    },
+        data: {
+
+          csv: '',
+        },
+
+        title: {
+          text: ''
+        },
+        
+        subTitle: {
+          text: ''
+        },
 
         plotOptions: {
-                    series: {
-                          visible: false,
-                    }
-                },
-}
-
+          series: {
+            visible: false,
+          }
+        },//this.createOptions(this)
+      }
     }
 
   },
@@ -433,21 +470,9 @@ export default {
     this.panelOpen = false
     this.showSpinner= true
     
+    
     document.addEventListener('getFlage', this.getQualityFlag.bind(this));
-   /*this.$http.get("http://localhost:9080/actris-datacenter-rest/rest/quicklook/download?uuid=91440f71-9c3e-5d31-befc-2729873ce581&folder=/GROUND-BASED/P2OA_Pic-Du-Midi/NEPHE/NEPHE_RAW/2016&image=PDM_NEPH_20160730.csv").then(
-    (response)=>{
-                  console.log( "******************************");
-                 console.log(  response);
-                  console.log( "******************************");
-                  this.options.data.csv = response.bodyText
-                  //console.log(  this.options.data.csv);
-                  Highcharts.chart('graph', this.options,function(){
-        this.series[0].show();
-    });
-                },
-    (response)=>{
-                  console.log("error")
-    });*/
+   
 
   },
 
@@ -458,7 +483,7 @@ export default {
     // evite le redimensionnement au chargement du canvas 
   $('.aeris-images-draw-relative-container').css('min-height', 340);
     $('.aeris-images-draw-relative-container').css('min-width', 1000);
-    
+
   },
  
   watch: {
@@ -469,6 +494,62 @@ export default {
   },
 
   methods: {
+
+    createOptions : function (vm) {
+       console.log("====***** titi " + vm.ZoomTypeX)
+      return {
+          
+            selection: function(event) {
+              var chart = this,
+                xAxis = event.xAxis[0],
+                plotLinesAndBands = xAxis.axis.plotLinesAndBands,
+                xMin = xAxis.min,
+                xMax = xAxis.max;
+              console.log(plotLinesAndBands)
+              event.preventDefault();
+              vm.id = vm.id + 1
+              chart.xAxis[0].addPlotBand({
+
+                from: xMin,
+                to: xMax,
+                color: 'rgba(209, 228, 235, 0.5)',
+                id: vm.id,
+                borderWidth: 2,
+                borderColor: 'red',
+                events: {
+
+                  mouseover: function(e) {
+                    console.log(vm.plotLinesAndBands)
+                    console.log(e)
+                    $("#title").text(vm.toolTipQuality);
+                    $("#targetPrice").text(vm.toolTipComment);
+                    $("#rating").text('XXXX');
+                    $("#ltGrowth").text('XXXX');
+                    $("#synopsis").text('XXXX');
+                    var box = $("#toolTipBox");
+                   
+                    box.css({
+                      left: e.pageX/3,
+                      top: e.pageY ,
+                      display: 'block',
+                    })
+                    $("#report").html(e.type + ' ' + chart.id);
+                  },
+                   mouseout: function (e) {
+                     
+                      $('#toolTipBox').hide();
+                          
+                       $("#report").html(e.type + ' ' + this.id);
+                   }
+                }
+              });
+                 
+            } 
+         
+        
+        }
+    },
+
 
     /*******************************/
     /* Generate simple debug trace */
@@ -484,29 +565,70 @@ export default {
     /* Get all informations from web-service */
     /*****************************************/
     queryService: function () {
-      this.debugTrace(this.debug,"**queryService start")
+      this.debugTrace(this.debug,"**queryService start 1")
      
       var _this = this;
       
       this.bounds = {};
       var url = _this.service + _this.date_file; /* Modify with the UUID */
+     console.log("https://sedoo.aeris-data.fr/actris-datacenter-rest/rest/quicklook/download?uuid=91440f71-9c3e-5d31-befc-2729873ce581&folder=/GROUND-BASED/P2OA_Pic-Du-Midi/NEPHE/NEPHE_RAW/"+_this.date_file.substring(0, 4)+"&image=PDM_NEPH_"+_this.date_file.replace(/\D/g,'')+".csv")
       this.$http.get("https://sedoo.aeris-data.fr/actris-datacenter-rest/rest/quicklook/download?uuid=91440f71-9c3e-5d31-befc-2729873ce581&folder=/GROUND-BASED/P2OA_Pic-Du-Midi/NEPHE/NEPHE_RAW/"+_this.date_file.substring(0, 4)+"&image=PDM_NEPH_"+_this.date_file.replace(/\D/g,'')+".csv").then(
     (response)=>{
                   console.log( "******************************");
                  console.log(  response);
                   console.log( "******************************");
-                  this.options.data.csv = response.bodyText
+                  _this.options.data.csv = response.bodyText
                   //console.log(  this.options.data.csv);
-                  Highcharts.chart('graph', this.options,function(){
-        this.series[0].show();
-    });
+               
+                 _this.chart=  Highcharts.chart('graph', _this.options,function(){
+                   this.series[0].show();
+                   var serie = this.series
+                   console.log("series")
+                   console.log( this.series[0])
+                   console.log("series")
+                  var  $legend = $('#customLegend');
+                  document.getElementById("customLegend").innerHTML = ""
+                 
+        $.each(this.series, function (j, data) {
+            
+            $legend.append('<div class="item"><div class="symbol" style="background-color:'+data.color+'"></div><div class="serieName" id="">' + data.name + '</div></div>');
+
+        });
+        
+        $('#customLegend .item').click(function(){
+            var inx = $(this).index(),
+                point = serie[inx];
+                
+            if(point.visible){
+                point.hide();
+                 $(this).css("color","gray")}
+            else{
+                point.show();
+                $(this).css("color","black")}
+        });        
+                
+                });
+                 console.log(this.chart)
+               /* _this.chart.renderer.rect(100, 100, 100, 100, 5)
+        .attr({
+            'stroke-width': 2,
+            stroke: 'red',
+            fill: 'yellow',
+            zIndex: 3
+        })
+        .add();*/
+                
+                 
+                
+                  
+    
                 },
     (response)=>{
                   console.log("error")
     });
       
       console.log("date +++ :" +  _this.date_file.replace(/\D/g,''))
-      $.ajax({
+      /*$.ajax({
         url: url,
         method: 'get',
         dataType: 'json'
@@ -536,7 +658,7 @@ export default {
           _this.img = data.image;
        }
        
-        /* Draw marks on the rules */
+         Draw marks on the rules 
         var arrX = [];
         var arrY = [];
        
@@ -567,7 +689,7 @@ export default {
         _this.img ="https://dummyimage.com/1500x500/babfc6/fff.jpg&text=no+graph+available+for+the+current+date"
         _this.resizeCanvas(_this.canvasTab[_this.getCurrentCanvasId()]);
         console.log('Error draw: ' + data.statusText);
-      });
+      });*/
        
        this.debugTrace(this.debug,"**queryService end")
     },
@@ -851,35 +973,35 @@ export default {
      /* document.addEventListener('keydown', this.handleKeyDown.bind(this));*/
 
       /* Mousedown */
-      canvas.on('mouse:down', this.handleMouseDown.bind(this));
+     // canvas.on('mouse:down', this.handleMouseDown.bind(this));
 
       /* Object modification (resize / move) */
-      canvas.on('object:modified', this.handleObjectModified.bind(this));
+     // canvas.on('object:modified', this.handleObjectModified.bind(this));
 
       /* Mouseup */
-      canvas.on('mouse:up', this.handleMouseUp.bind(this));
+     // canvas.on('mouse:up', this.handleMouseUp.bind(this));
 
       /* Mousemove */
-      canvas.on('mouse:move', this.handleMouseMove.bind(this));
+     // canvas.on('mouse:move', this.handleMouseMove.bind(this));
 
       /* Mouse wheel event */
-      canvas.wrapperEl.addEventListener("mousewheel", this.handleMouseWheel.bind(this));
-      canvas.wrapperEl.addEventListener("DOMMouseScroll", this.handleMouseWheel.bind(this));
+     // canvas.wrapperEl.addEventListener("mousewheel", this.handleMouseWheel.bind(this));
+     // canvas.wrapperEl.addEventListener("DOMMouseScroll", this.handleMouseWheel.bind(this));
 
       /* On element unselection */
-      canvas.on('before:selection:cleared', this.handleObjectUnselected.bind(this));
-      canvas.on('object:added', this.handleObjectCreated.bind(this));
+      //canvas.on('before:selection:cleared', this.handleObjectUnselected.bind(this));
+     // canvas.on('object:added', this.handleObjectCreated.bind(this));
        /* On element selection */
-      canvas.on('object:selected', this.handleObjectselected.bind(this));
+      //canvas.on('object:selected', this.handleObjectselected.bind(this));
 
       /* MouseOver */
-      canvas.on('mouse:over', this.handleMouseOver.bind(this));
+     // canvas.on('mouse:over', this.handleMouseOver.bind(this));
 
       /* MouseOut */
-      canvas.on('mouse:out', this.handleMouseOut.bind(this));
+     // canvas.on('mouse:out', this.handleMouseOut.bind(this));
 
       /*keep the stroke width*/
-      canvas.on('object:scaling', this.keepStrokeWidth.bind(this))
+      //canvas.on('object:scaling', this.keepStrokeWidth.bind(this))
 
       this.debugTrace(this.debug, "**setListeners start")
     },
@@ -1447,8 +1569,38 @@ export default {
     /**********************************/
     drawMode: function () {
       this.debugTrace(this.debug, "**drawMode start")
-      if (this.isPanning) this.isPanning = false;
-      this.isDrawing = !this.isDrawing;
+      
+      this.chart.update(
+        {
+         chart: {zoomType: "x",animation: false,  renderTo: 'graph',}  })
+      var _this= this 
+     /* Highcharts.addEvent(this.chart, 'selection', function (event) {
+      console.log( "selection")
+                 var xMin = event.xAxis[0].min
+                  var xMax = event.xAxis[0].max
+                 var  yMin = event.yAxis[0].min
+                 var  yMax = event.yAxis[0].max
+                  console.log( "xMin" +xMin)
+                  console.log( "xMax" +xMax )
+                  console.log( "yMin"+ yMin)
+                  console.log( "yMax"+yMax)
+                 console.log( _this.chart.plotHeight +  _this.chart.plotTop - yMax)
+                    _this.renderer.rect(
+                        xMin + _this.chart.plotLeft,
+                         _this.chart.plotHeight +  _this.chart.plotTop - yMax,
+                        xMax - xMin,
+                        yMax - yMin,
+                    ).attr({
+        'stroke-width': 2,
+        stroke: 'red',
+        fill: 'yellow',
+        zIndex: 3
+    })
+    .add();; 
+                    event.preventDefault();
+                
+    })*/
+      
       this.debugTrace(this.debug, "**drawMode end")
     },
 
@@ -2625,5 +2777,49 @@ input[type=number]::-webkit-outer-spin-button {
 .elementUnselected select textarea {
   
 
+}
+
+#toolTipBox {
+     background-color: White;
+     position: absolute;
+     border-radius: 5px;
+     border: 2px solid #808080;
+     padding: 10px;
+     width: 20%;
+     display: none;
+     /*top: 100px;*/
+     box-shadow: 1px 1px 3px #666;
+     /*min-width: 100px;*/
+ }
+ .tooltipText {
+     font-weight: normal !important;
+     font-size: 11px;
+ }
+ .tooltipHeader {
+     color: #FF6B00;
+     font-weight: bold;
+     font-size: 13px;
+ }
+ .tooltipLabel {
+     font-weight: bold;
+     font-size: 12px;
+ }
+
+ .symbol {
+    width:5px;
+    height:5px;
+    margin-right:20px;
+    float:left;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+}
+.serieName {
+    float:left;
+    cursor:pointer;
+}
+
+.item {
+    height:30px;
+    clear:both;
 }
 </style>

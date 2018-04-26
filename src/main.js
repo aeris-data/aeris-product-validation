@@ -6,6 +6,7 @@ import vueCustomElement from 'vue-custom-element'
 import vueNavTabs from 'vue-nav-tabs'
 import vueResource from 'vue-resource'
 import Highcharts from 'highcharts';
+import HighchartsVue from 'highcharts-vue'
 
 import AerisValidationProduct from './aeris-validation-product/aeris-validation-product.vue';
 import AerisDrawImage from './aeris-image-draw/aeris-images-draw.vue';
@@ -15,6 +16,7 @@ import AerisInstrumentSelect from './aeris-image-draw/aeris-instrument-select.vu
 Vue.use(vueCustomElement);
 Vue.use(vueNavTabs);
 Vue.use(Highcharts);
+Vue.use(HighchartsVue);
 Vue.use(vueResource);
 
 
@@ -35,7 +37,8 @@ ljs.addAliases({
           "https://unpkg.com/highcharts/highcharts.js",
            //<!-- vue-highcharts should be load after Highcharts -->
            "https://cdnjs.cloudflare.com/ajax/libs/highcharts/6.0.7/js/modules/data.js",
-           "https://code.highcharts.com/modules/exporting.js"
+           "https://code.highcharts.com/modules/exporting.js",
+           "https://code.highcharts.com/maps/modules/map.js"
           ]
 })
 ljs.load('dep', function() {

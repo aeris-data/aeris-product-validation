@@ -20,7 +20,7 @@
             <i class="fa fa-cogs"></i>&nbsp {{SerieTitle}}
           </h3>
         </header>
-        <aeris-day-images service="https://sedoo.aeris-data.fr/actris-datacenter-rest/rest/validation/daily?uuid=91440f71-9c3e-5d31-befc-2729873ce581&day="lang="fr" ></aeris-day-images>
+        <aeris-day-images service="https://sedoo.aeris-data.fr/actris-datacenter-rest/rest/validation/dailydetail?uuid=91440f71-9c3e-5d31-befc-2729873ce581&day=2018-04-10"lang="fr" ></aeris-day-images>
 <!--        <aeris-day-images service="http://localhost:9080/actris-datacenter-rest/rest/validation/daily?uuid=91440f71-9c3e-5d31-befc-2729873ce581&day="lang="fr" ></aeris-day-images>
 -->        <!--"https://sedoo.aeris-data.fr/actris-datacenter-rest/rest/validation/daily?uuid=91440f71-9c3e-5d31-befc-2729873ce581&day="-->
       </div>
@@ -81,6 +81,7 @@ export default {
   },
 
   mounted : function () {
+   
          
   },
 
@@ -114,11 +115,10 @@ export default {
       console.log("uuid of selected serie : "+ serie.uuid)
       var uuidPara =  "uuid="+serie.uuid+"&day="
                         
-      //this.serviceUrl="http://localhost:9080/actris-datacenter-rest/rest/validation/daily?"+uuidPara
+      //this.serviceUrl="http://localhost:9080/actris-datacenter-rest/rest/validation/daily?" + uuidPara
       this.serviceUrl="https://sedoo.aeris-data.fr/actris-datacenter-rest/rest/validation/daily?"+uuidPara
       this.viewElement = document.querySelector('aeris-day-images');
       this.viewElement.setAttribute("service", this.serviceUrl);
-     // this.viewElement.setAttribute("date_format", clickedElement.getAttribute("data-date-format"));
       this.getLabelValue(serie.uuid);
     },
 
