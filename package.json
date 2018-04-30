@@ -12,6 +12,7 @@
     "debounce": "^1.0.2",
     "exports-loader": "^0.6.4",
     "highcharts": "^6.1.0",
+    "highcharts-vue": "^1.0.1",
     "vue": "^2.3.3",
     "vue-custom-element": "^1.2.1",
     "vue-nav-tabs": "^0.5.4",
