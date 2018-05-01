@@ -3,7 +3,7 @@
     <div class="aeris-validation-product-component-container" v-if="orcid !='none'">
       <div class="aeris-validation-product-navbar">
         <header style="background: #4765a0;">
-          <h3>
+          <h3 style="clear:none">
             <i class="fa fa-area-chart"></i>&nbsp Serie available
           </h3>
         </header>
@@ -16,7 +16,7 @@
       
       <div class="aeris-validation-product-validation-panel" >
         <header style="background: #4765a0;">
-          <h3>
+          <h3 style="clear:none">
             <i class="fa fa-cogs"></i>&nbsp {{SerieTitle}}
           </h3>
         </header>
@@ -199,7 +199,7 @@ export default {
   text-align: center;
   display: flex;
   align-items: center;
-  padding-left:15px
+  padding-left:15px;
   clear : none
 }
 
