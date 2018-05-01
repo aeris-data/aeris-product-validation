@@ -354,7 +354,7 @@ aeris-images-draw {
   background: transparent;
   outline: none;
   text-align: center;
-  line-height: 30px;
+  
   border: 1px solid;
   cursor: pointer
 }

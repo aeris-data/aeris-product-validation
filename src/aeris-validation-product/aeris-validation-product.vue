@@ -200,6 +200,7 @@ export default {
   display: flex;
   align-items: center;
   padding-left:15px
+  clear : none
 }
 
 .aeris-validation-product-component-container {
