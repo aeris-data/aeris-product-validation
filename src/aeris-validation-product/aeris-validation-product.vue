@@ -252,7 +252,7 @@ export default {
 
 
 .aeris-validation-product-validation-panel {
-  float: right;
+ 
 
 }
 

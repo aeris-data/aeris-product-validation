@@ -445,6 +445,11 @@ export default {
         tooltip: {
           enabled: false
         },
+        yAxis: {
+        title: {
+            text: 'Scattering coefficient (Mm-1)'
+        }
+        },
         legend: {
           enabled: false
         },
@@ -506,6 +511,8 @@ export default {
       console.log("====***** titi " + vm.ZoomTypeX);
       return {
         selection: function(event) {
+          vm.toolTipQuality= '';
+          vm.toolTipComment=''
           var chart = this,
             xAxis = event.xAxis[0],
             plotLinesAndBands = xAxis.axis.plotLinesAndBands,
@@ -525,18 +532,24 @@ export default {
 
             events: {
               click: function (e) {
+                if (vm.toolTipComment !=''){
+                vm.parameterPlotband[this.id].quality = vm.toolTipQuality
+                vm.parameterPlotband[this.id].comment = vm.toolTipComment
                     console.log(this)
                     this.svgElem.attr('stroke', 'blue')
                    console.log( this.svgElem.element.stroke)
+                    vm.toolTipQuality= '';
+                    vm.toolTipComment=''
+                }
                 },
               mouseover: function(e) {
-                vm.parameterPlotband[this.id].comment = vm.toolTipQuality
+               // vm.parameterPlotband[this.id].quality = vm.toolTipQuality
                 console.log();
                   console.log(vm.parameterPlotband[this.id])
                 console.log(e);
-
-                $("#title").text(vm.toolTipQuality);
-                $("#targetPrice").text(vm.toolTipComment);
+                if (vm.parameterPlotband[this.id].quality) {
+                $("#title").text(vm.parameterPlotband[this.id].quality);
+                $("#targetPrice").text(vm.parameterPlotband[this.id].comment);
                 $("#rating").text("Samir BOUMAZA");
                 var start = Date.now();
                 $("#ltGrowth").text(moment(new Date()).format("DD/MM/YYYY"));
@@ -550,6 +563,7 @@ export default {
                   display: "block"
                 });
                 $("#report").html(e.type + " " + chart.id);
+              }
               },
               mouseout: function(e) {
                 $("#toolTipBox").hide();
@@ -2352,7 +2366,7 @@ input[type="number"]::-webkit-outer-spin-button {
   -ms-flex-pack: center;
   justify-content: center;
   margin: 0;
-  padding: 20px;
+  padding-top: 20px;
   color: #333;
 
   font-family: "Open Sans", sans-serif;
@@ -2511,7 +2525,7 @@ input[type="number"]::-webkit-outer-spin-button {
   -ms-flex-flow: column nowrap;
   flex-flow: column nowrap;
   /*border-left: 1px solid #ccc;*/
-  padding-left: 10px;
+  /*padding-left: 10px;*/
   margin-left: 10px;
 }
 
@@ -2748,11 +2762,11 @@ input[type="number"]::-webkit-outer-spin-button {
   border: none;
   outline: none;
   /*border-radius: 50%;*/
-  width: 3.3rem;
-  height: 2.6rem;
+  width: 2rem;
+  height: 2rem;
   background: #eee;
   color: #fff;
-  font-size: 1.3rem;
+  font-size: 1rem;
   cursor: pointer;
   background-color: #4765a0;
   border-radius: inherit;
